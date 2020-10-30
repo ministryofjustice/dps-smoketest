@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.hmppstemplatepackagename.config
+package uk.gov.justice.digital.hmpps.dpssmoketest.config
 
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -11,7 +11,7 @@ import javax.validation.ValidationException
 
 
 @RestControllerAdvice
-class HmppsTemplateKotlinExceptionHandler {
+class DpsSmoketestExceptionHandler {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
     log.info("Validation exception: {}", e.message)
