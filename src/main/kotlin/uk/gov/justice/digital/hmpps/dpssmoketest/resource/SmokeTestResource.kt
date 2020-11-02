@@ -3,10 +3,12 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.resource
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
+@Tag(name = "DPS Smoke Tests")
 @RestController
 class SmokeTestResource {
 
