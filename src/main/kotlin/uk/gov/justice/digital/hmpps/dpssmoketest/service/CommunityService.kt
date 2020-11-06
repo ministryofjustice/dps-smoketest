@@ -13,25 +13,29 @@ data class TestStatus(val testComplete: Boolean, val testResult: TestResult)
 @Service
 class CommunityService {
 
+  var testResultPollCount = 0
+
   fun resetTestData(): TestResult {
     Thread.sleep(100)
-    return TestResult("Reset Community test data ")
+    return TestResult("Reset Community test data")
   }
 
-  fun checkTestResults(testMode: TestMode): Flux<TestResult> =
-    Flux.interval(Duration.ofMillis(1000))
+  fun checkTestResults(testMode: TestMode): Flux<TestResult> {
+    testResultPollCount = 0
+    return Flux.interval(Duration.ofMillis(1000))
         .take(Duration.ofSeconds(10))
         .map { checkTestResult(testMode) }
         .takeWhile { it.testComplete.not() }
         .map { it.testResult }
+  }
 
   fun checkTestResult(testMode: TestMode, lastTest: Boolean = false): TestStatus {
     Thread.sleep(100)
+    testResultPollCount++
     if (testMode == TIMEOUT)
       return TestStatus(testComplete = false, TestResult("Test still running (testMode=TIMEOUT)"))
 
-    val randomizer = Math.random()
-    if (lastTest.not() && randomizer < 0.9)
+    if (lastTest.not() && testResultPollCount < 6)
       return TestStatus(testComplete = false, TestResult("Test still running (testMode=$testMode)"))
 
     return if (testMode == SUCCEED)
