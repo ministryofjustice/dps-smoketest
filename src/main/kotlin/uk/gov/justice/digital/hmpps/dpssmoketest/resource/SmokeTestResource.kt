@@ -36,8 +36,5 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
 
   data class TestResult(val description: String, val outcome: Boolean? = null)
 
-  @GetMapping("/smoke-test-unsecured", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-  fun smokeTestUnsecure(@RequestParam(required = false, defaultValue = "SUCCEED") testMode: TestMode): Flux<TestResult> = smokeTestService.runSmokeTest(testMode)
-
   enum class TestMode { TIMEOUT, FAIL, SUCCEED }
 }
