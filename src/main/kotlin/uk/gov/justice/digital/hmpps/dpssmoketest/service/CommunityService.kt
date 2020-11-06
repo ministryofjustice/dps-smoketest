@@ -49,7 +49,7 @@ class CommunityService(
     return if (testMode == SUCCEED)
       TestStatus(testComplete = true, TestResult("Test has completed successfully", true))
     else
-      TestStatus(testComplete = true, TestResult("Test has failed", true))
+      TestStatus(testComplete = true, TestResult("Test has failed", false))
   }
 
 }

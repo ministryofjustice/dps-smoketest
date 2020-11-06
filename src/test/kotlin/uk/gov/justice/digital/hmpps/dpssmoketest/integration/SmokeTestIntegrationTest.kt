@@ -86,7 +86,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       StepVerifier.create(results.responseBody)
           .expectNext(TestResult("Reset Community test data"), TestResult("Test triggered"))
           .expectNextSequence(inProgressResults(communityService.maxTestPollCount.toInt(), "FAIL"))
-          .expectNext(TestResult("Test has failed", true))
+          .expectNext(TestResult("Test has failed", fail))
           .thenCancel()
           .verify()
 
