@@ -51,3 +51,7 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+test:
+  maxLengthSeconds: 600
+  resultPollMs: 10000

@@ -8,3 +8,7 @@ spring:
 oauth:
   endpoint:
     url: http://localhost:8080
+
+test:
+  maxLengthSeconds: 10
+  resultPollMs: 1000

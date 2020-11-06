@@ -3,17 +3,20 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.CommunityService
 
 class SmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   protected lateinit var jwtAuthHelper: JwtAuthHelper
+
+  @Autowired
+  private lateinit var communityService: CommunityService
 
   @Nested
   inner class Authentication {
@@ -44,11 +47,12 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
           .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
           .exchange()
           .expectStatus().isOk
+
     }
   }
 
   @Nested
-  inner class TestOutcomeScenarios {
+  inner class CircleExperiments {
 
     @Test
     fun `test succeeds`() {
@@ -62,7 +66,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
           .expectNext(TestResult("Reset Community test data"), TestResult("Test triggered"))
-          .expectNextSequence(inProgressResults(4, "SUCCEED"))
+          .expectNextSequence(inProgressResults(communityService.maxTestPollCount.toInt(), "SUCCEED"))
           .expectNext(TestResult("Test has completed successfully", true))
           .thenCancel()
           .verify()
@@ -81,7 +85,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
           .expectNext(TestResult("Reset Community test data"), TestResult("Test triggered"))
-          .expectNextSequence(inProgressResults(4, "FAIL"))
+          .expectNextSequence(inProgressResults(communityService.maxTestPollCount.toInt(), "FAIL"))
           .expectNext(TestResult("Test has failed", true))
           .thenCancel()
           .verify()

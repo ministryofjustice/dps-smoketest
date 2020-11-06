@@ -14,3 +14,7 @@ server:
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
+
+test:
+  maxLengthSeconds: 10
+  resultPollMs: 1000
