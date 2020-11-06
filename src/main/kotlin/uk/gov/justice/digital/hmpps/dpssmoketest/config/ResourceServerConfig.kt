@@ -18,7 +18,7 @@ class ResourceServerConfig : WebSecurityConfigurerAdapter() {
       sessionManagement { SessionCreationPolicy.STATELESS }
       csrf { disable() }
       authorizeRequests {
-        listOf("/webjars/**", "/favicon.ico", "/health/**", "/info", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",)
+        listOf("/webjars/**", "/favicon.ico", "/health/**", "/info", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
             .forEach { authorize(AntPathRequestMatcher(it), permitAll) }
         authorize(anyRequest)
       }

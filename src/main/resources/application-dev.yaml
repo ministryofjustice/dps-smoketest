@@ -4,3 +4,11 @@ spring:
       resourceserver:
         jwt:
           public-key-location: classpath:local-public-key.pub
+
+oauth:
+  endpoint:
+    url: http://localhost:8080
+
+test:
+  maxLengthSeconds: 10
+  resultPollMs: 1000
