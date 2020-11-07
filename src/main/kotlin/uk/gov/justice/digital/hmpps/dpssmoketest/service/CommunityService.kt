@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -17,6 +18,10 @@ class CommunityService(
     @Value("\${test.resultPollMs}") private val testResultPollMs: Long
 ) {
 
+  companion object {
+    val log = LoggerFactory.getLogger(this::class.java)
+  }
+
   /*
    * The number of times to poll before completing a SUCCEED or FAIL test
    * e.g. in SmokeTestIntegrationTest this is (10*1000)/(2*1000)=5 polls (taking 5 seconds)
@@ -33,9 +38,13 @@ class CommunityService(
     var testPollCount = 0
     return Flux.interval(Duration.ofMillis(testResultPollMs))
         .take(Duration.ofSeconds(testMaxLengthSeconds))
-        .map { checkTestResult(testMode, testPollCount++) }
+        .map {checkTestResult(testMode, testPollCount++) }
         .takeWhile { it.testComplete.not() }
         .map { it.testResult }
+        .doOnError { log.error("Error received polling test results", it) }
+        .doOnComplete { log.info("Completed polling test results") }
+        .doOnCancel { log.info("Cancelled polling test results") }
+        .doOnTerminate { log.info("Terminated polling test results") }
   }
 
   fun checkTestResult(testMode: TestMode, testPollCount: Int = 0, lastTest: Boolean = false): TestStatus {
