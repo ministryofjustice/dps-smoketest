@@ -40,7 +40,6 @@ workflows:
             branches:
               only:
                 - main
-                - DT-1274-SmokeTest
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -48,7 +47,6 @@ workflows:
             branches:
               only:
                 - main
-                - DT-1274-SmokeTest
           requires:
             - validate
             - build_docker
