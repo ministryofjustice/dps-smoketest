@@ -17,13 +17,14 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
     prisonApi.start()
   }
 
-  override fun afterAll(context: ExtensionContext?) {
+  override fun beforeEach(context: ExtensionContext?) {
     prisonApi.resetAll()
   }
 
-  override fun beforeEach(context: ExtensionContext?) {
+  override fun afterAll(context: ExtensionContext?) {
     prisonApi.stop()
   }
+
 
 }
 class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {

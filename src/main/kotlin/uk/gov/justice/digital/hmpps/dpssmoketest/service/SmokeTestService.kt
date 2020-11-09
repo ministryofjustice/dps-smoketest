@@ -15,9 +15,12 @@ class SmokeTestService(
     val probationDataResetResult = communityService.resetTestData("X360040");
     if (probationDataResetResult.outcome == false) return Flux.just(probationDataResetResult)
 
+    val triggerTestResult = prisonService.triggerTest("A7742DY")
+    if (triggerTestResult.outcome == false) return Flux.fromIterable(listOf(probationDataResetResult, triggerTestResult))
+
     return Flux.concat(
         Flux.just(probationDataResetResult),
-        Flux.just(prisonService.triggerTest()),
+        Flux.just(triggerTestResult),
         communityService.checkTestResults(testMode),
         Flux.just(communityService.checkTestResult(testMode, lastTest = true).testResult)
     )

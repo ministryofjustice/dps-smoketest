@@ -35,12 +35,10 @@ class CommunityService(
   val maxTestPollCount = (2 * testMaxLengthSeconds * 1000) / (3 * testResultPollMs)
 
   fun resetTestData(crn: String): TestResult {
-    fun failIfNotFound(exception: Throwable): Mono<out TestResult> {
-      return if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Reset Community test failed. The offender $crn can not be found", false)) else Mono.error(exception)
-    }
-    fun failOnError(exception: Throwable): Mono<out TestResult> {
-      return if (exception is WebClientResponseException) Mono.just(TestResult("Reset Community test date for $crn failed due to ${exception.message}", false)) else Mono.error(exception)
-    }
+    fun failIfNotFound(exception: Throwable): Mono<out TestResult> =
+        if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Reset Community test failed. The offender $crn can not be found", false)) else Mono.error(exception)
+    fun failOnError(exception: Throwable): Mono<out TestResult> =
+        Mono.just(TestResult("Reset Community test data for $crn failed due to ${exception.message}", false))
 
 
     return webClient.post()
