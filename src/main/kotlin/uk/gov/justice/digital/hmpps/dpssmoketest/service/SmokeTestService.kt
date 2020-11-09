@@ -21,8 +21,8 @@ class SmokeTestService(
     return Flux.concat(
         Flux.just(probationDataResetResult),
         Flux.just(triggerTestResult),
-        communityService.checkTestResults(testMode),
-        Flux.just(communityService.checkTestResult(testMode, lastTest = true).testResult)
+        communityService.checkTestResults("A7742DY", "38479A"),
+        Flux.from(communityService.checkTestResult("A7742DY", "38479A")).map { it.testResult }
     )
   }
 

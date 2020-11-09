@@ -8,9 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestMode
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestMode.SUCCEED
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestMode.TIMEOUT
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
 import java.time.Duration
 
@@ -37,6 +34,7 @@ class CommunityService(
   fun resetTestData(crn: String): TestResult {
     fun failIfNotFound(exception: Throwable): Mono<out TestResult> =
         if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Reset Community test failed. The offender $crn can not be found", false)) else Mono.error(exception)
+
     fun failOnError(exception: Throwable): Mono<out TestResult> =
         Mono.just(TestResult("Reset Community test data for $crn failed due to ${exception.message}", false))
 
@@ -51,31 +49,30 @@ class CommunityService(
         .block() ?: TestResult("Reset Community test data failed", false)
   }
 
-  fun checkTestResults(testMode: TestMode): Flux<TestResult> {
-    var testPollCount = 0
+  fun checkTestResults(nomsNumber: String, bookNumber: String): Flux<TestResult> {
     return Flux.interval(Duration.ofMillis(testResultPollMs))
         .take(Duration.ofSeconds(testMaxLengthSeconds))
-        .map { checkTestResult(testMode, testPollCount++) }
-        .takeWhile { it.testComplete.not() }
-        .map { it.testResult }
-        .doOnError { log.error("Error received polling test results", it) }
-        .doOnComplete { log.info("Completed polling test results") }
-        .doOnCancel { log.info("Cancelled polling test results") }
-        .doOnTerminate { log.info("Terminated polling test results") }
+        .flatMap {
+          checkTestResult(nomsNumber, bookNumber)
+        }
+        .takeWhile {
+          it.testComplete.not()
+        }
+        .map {
+          it.testResult
+        }
   }
 
-  fun checkTestResult(testMode: TestMode, testPollCount: Int = 0, lastTest: Boolean = false): TestStatus {
-    Thread.sleep(100)
-    if (testMode == TIMEOUT)
-      return TestStatus(testComplete = false, TestResult("Test still running (testMode=TIMEOUT)"))
+  fun checkTestResult(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
+    fun notFoundYetOnNotFound(exception: Throwable): Mono<out TestStatus> =
+        if (exception is WebClientResponseException.NotFound) Mono.just(TestStatus(false, TestResult("Still waiting for offender $nomsNumber with booking $bookNumber to be updated"))) else Mono.error(exception)
 
-    if (lastTest.not() && testPollCount < maxTestPollCount)
-      return TestStatus(testComplete = false, TestResult("Test still running (testMode=$testMode)"))
-
-    return if (testMode == SUCCEED)
-      TestStatus(testComplete = true, TestResult("Test has completed successfully", true))
-    else
-      TestStatus(testComplete = true, TestResult("Test has failed", false))
+    return webClient.get()
+        .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)
+        .retrieve()
+        .toBodilessEntity()
+        .map { TestStatus(true, TestResult("Test for offender $nomsNumber with booking $bookNumber has completed successfully", true)) }
+        .onErrorResume(::notFoundYetOnNotFound)
   }
 
 }

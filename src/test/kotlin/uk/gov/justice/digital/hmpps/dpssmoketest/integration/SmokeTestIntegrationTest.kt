@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -13,16 +14,12 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
-import uk.gov.justice.digital.hmpps.dpssmoketest.service.CommunityService
 import java.net.HttpURLConnection
 
 class SmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   protected lateinit var jwtAuthHelper: JwtAuthHelper
-
-  @Autowired
-  private lateinit var communityService: CommunityService
 
   @Nested
   inner class Authentication {
@@ -90,6 +87,18 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
           .withStatus(HttpURLConnection.HTTP_OK)))
       PrisonApiExtension.prisonApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
           .withStatus(HttpURLConnection.HTTP_OK)))
+      CommunityApiExtension.communityApi.stubFor(WireMock.get(WireMock.anyUrl())
+          .inScenario("My Scenario")
+          .whenScenarioStateIs(STARTED)
+          .willReturn(WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_NOT_FOUND))
+          .willSetStateTo("Found"))
+      CommunityApiExtension.communityApi.stubFor(WireMock.get(WireMock.anyUrl())
+          .inScenario("My Scenario")
+          .whenScenarioStateIs("Found")
+          .willReturn(WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_OK)))
+
     }
 
     @Test
@@ -104,8 +113,8 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
           .expectNext(TestResult("Reset Community test data for X360040"), TestResult("Triggered test for A7742DY"))
-          .expectNextSequence(inProgressResults(communityService.maxTestPollCount.toInt(), "SUCCEED"))
-          .expectNext(TestResult("Test has completed successfully", true))
+          .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
+          .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", true))
           .thenCancel()
           .verify()
 
@@ -143,10 +152,3 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
 }
 
-private fun inProgressResults(count: Int, testMode: String): List<TestResult> {
-  val results = mutableListOf<TestResult>()
-  repeat(count) {
-    results.add(TestResult("Test still running (testMode=$testMode)"))
-  }
-  return results.toList()
-}
