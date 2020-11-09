@@ -34,8 +34,6 @@ class CommunityApiMockServer : WireMockServer(WIREMOCK_PORT) {
     private const val WIREMOCK_PORT = 8096
   }
 
-  fun getCountFor(url: String) = CommunityApiExtension.communityApi.findAll(getRequestedFor(urlEqualTo(url))).count()
-
   fun stubHealthPing(status: Int) {
     stubFor(get("/health/ping").willReturn(aResponse()
         .withHeader("Content-Type", "application/json")

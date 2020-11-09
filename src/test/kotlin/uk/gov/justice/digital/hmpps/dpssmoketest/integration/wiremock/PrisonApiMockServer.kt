@@ -31,8 +31,6 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
     private const val WIREMOCK_PORT = 8093
   }
 
-  fun getCountFor(url: String) = PrisonApiExtension.prisonApi.findAll(WireMock.getRequestedFor(WireMock.urlEqualTo(url))).count()
-
   fun stubHealthPing(status: Int) {
     stubFor(WireMock.get("/health/ping").willReturn(WireMock.aResponse()
         .withHeader("Content-Type", "application/json")

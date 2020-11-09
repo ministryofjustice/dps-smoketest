@@ -11,11 +11,16 @@ class SmokeTestService(
     private val communityService: CommunityService,
 ) {
 
-  fun runSmokeTest(testMode: TestMode): Flux<TestResult> = Flux.concat(
-      Flux.just(communityService.resetTestData()),
-      Flux.just(prisonService.triggerTest()),
-      communityService.checkTestResults(testMode),
-      Flux.just(communityService.checkTestResult(testMode, lastTest = true).testResult)
-  )
+  fun runSmokeTest(testMode: TestMode): Flux<TestResult> {
+    val probationDataResetResult = communityService.resetTestData("X360040");
+    if (probationDataResetResult.outcome == false) return Flux.just(probationDataResetResult)
+
+    return Flux.concat(
+        Flux.just(probationDataResetResult),
+        Flux.just(prisonService.triggerTest()),
+        communityService.checkTestResults(testMode),
+        Flux.just(communityService.checkTestResult(testMode, lastTest = true).testResult)
+    )
+  }
 
 }
