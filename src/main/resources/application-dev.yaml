@@ -9,6 +9,12 @@ oauth:
   endpoint:
     url: http://localhost:8080
 
+prisonapi:
+  endpoint.url: http://localhost:8093
+
+community:
+  endpoint.url: http://localhost:8096
+
 test:
   maxLengthSeconds: 10
   resultPollMs: 1000

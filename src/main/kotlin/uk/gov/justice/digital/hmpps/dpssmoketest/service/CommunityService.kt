@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestMode
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestMode.SUCCEED
@@ -15,7 +17,8 @@ data class TestStatus(val testComplete: Boolean, val testResult: TestResult)
 @Service
 class CommunityService(
     @Value("\${test.maxLengthSeconds}") private val testMaxLengthSeconds: Long,
-    @Value("\${test.resultPollMs}") private val testResultPollMs: Long
+    @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
+    @Qualifier("communityApiWebClient") private val webClient: WebClient
 ) {
 
   companion object {
@@ -29,7 +32,7 @@ class CommunityService(
    */
   val maxTestPollCount = (2*testMaxLengthSeconds*1000)/(3*testResultPollMs)
 
-  fun resetTestData(): TestResult {
+  fun resetTestData(crn: String): TestResult {
     Thread.sleep(100)
     return TestResult("Reset Community test data")
   }
