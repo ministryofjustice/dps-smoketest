@@ -53,5 +53,5 @@ management:
         time-to-live: 2000ms
 
 test:
-  maxLengthSeconds: 30
-  resultPollMs: 5000
+  resultPollMs: 10000
+  maxLengthSeconds: 540
