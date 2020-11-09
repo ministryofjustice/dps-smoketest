@@ -24,10 +24,10 @@ class CommunityService(
 
   /*
    * The number of times to poll before completing a SUCCEED or FAIL test
-   * e.g. in SmokeTestIntegrationTest this is (10*1000)/(2*1000)=5 polls (taking 5 seconds)
-   * e.g. in a Circle build this is (600*1000)/(2*10000)=30 polls (taking 300 seconds)
+   * e.g. in SmokeTestIntegrationTest this is (2*10*1000)/(3*1000)=6 polls (taking 6 seconds)
+   * e.g. in a Circle build this is (2*600*1000)/(3*10000)=40 polls (taking 400 seconds)
    */
-  val maxTestPollCount = (testMaxLengthSeconds*1000)/(2*testResultPollMs)
+  val maxTestPollCount = (2*testMaxLengthSeconds*1000)/(3*testResultPollMs)
 
   fun resetTestData(): TestResult {
     Thread.sleep(100)
