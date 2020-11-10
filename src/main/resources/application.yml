@@ -18,6 +18,23 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${oauth.endpoint.url}/.well-known/jwks.json
+      client:
+        registration:
+          prison-api:
+            provider: hmpps-auth
+            client-id: ${smoketest.client.client-id}
+            client-secret: ${smoketest.client.client-secret}
+            authorization-grant-type: client_credentials
+            scope: read
+          community-api:
+            provider: hmpps-auth
+            client-id: ${smoketest.client.client-id}
+            client-secret: ${smoketest.client.client-secret}
+            authorization-grant-type: client_credentials
+            scope: read
+        provider:
+          hmpps-auth:
+            token-uri: ${oauth.endpoint.url}/oauth/token
 
 
 server:
@@ -53,5 +70,14 @@ management:
         time-to-live: 2000ms
 
 test:
-  maxLengthSeconds: 600
   resultPollMs: 10000
+  maxLengthSeconds: 540
+
+
+smoketest:
+  client:
+    client-id: ${oauth.client.id}
+    client-secret: ${oauth.client.secret}
+    access-token-uri: ${oauth.token.url}
+    authentication-scheme: header
+    client-authentication-scheme: header

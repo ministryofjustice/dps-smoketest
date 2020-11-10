@@ -13,6 +13,12 @@ env:
   - name: OAUTH_ENDPOINT_URL
     value: "{{ .Values.env.OAUTH_ENDPOINT_URL }}"
 
+  - name: PRISONAPI_ENDPOINT_URL
+    value: "{{ .Values.env.PRISONAPI_ENDPOINT_URL }}"
+
+  - name: COMMUNITY_ENDPOINT_URL
+    value: "{{ .Values.env.COMMUNITY_ENDPOINT_URL }}"
+
   - name: SPRING_PROFILES_ACTIVE
     value: "logstash"
 
