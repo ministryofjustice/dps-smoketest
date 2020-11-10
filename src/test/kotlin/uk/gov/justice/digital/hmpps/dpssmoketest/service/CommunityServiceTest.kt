@@ -35,6 +35,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       service.resetTestData("X12345")
 
       CommunityApiExtension.communityApi.verify(postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/custody/reset"))
+          .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("Bearer ABCDE")))
     }
 

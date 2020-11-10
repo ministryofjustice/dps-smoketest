@@ -31,6 +31,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       service.triggerTest("A7742DY")
 
       PrisonApiExtension.prisonApi.verify(postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
+          .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("Bearer ABCDE")))
     }
 

@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.service
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -41,6 +42,7 @@ class CommunityService(
 
     return webClient.post()
         .uri("/secure/smoketest/offenders/crn/{crn}/custody/reset", crn)
+        .contentType(MediaType.APPLICATION_JSON)
         .retrieve()
         .toBodilessEntity()
         .map { TestResult("Reset Community test data for $crn") }
