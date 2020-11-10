@@ -19,3 +19,5 @@ ingress:
 env:
   JAVA_OPTS: "-Xmx512m"
   OAUTH_ENDPOINT_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
+  PRISONAPI_ENDPOINT_URL: "https://api-dev.prison.service.justice.gov.uk"
+  COMMUNITY_ENDPOINT_URL: "https://community-api-secure.test.delius.probation.hmpps.dsd.io"
