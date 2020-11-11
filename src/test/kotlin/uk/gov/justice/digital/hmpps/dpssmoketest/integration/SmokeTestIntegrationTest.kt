@@ -65,7 +65,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `test fails after first step`() {
       val results: FluxExchangeResult<TestResult> = webTestClient.post()
-          .uri("/smoke-test?testMode=SUCCEED")
+          .uri("/smoke-test")
           .accept(TEXT_EVENT_STREAM)
           .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
           .exchange()
@@ -74,8 +74,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
           .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", false))
-          .thenCancel()
-          .verify()
+          .verifyComplete()
     }
   }
 
@@ -104,7 +103,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `test succeeds`() {
       val results: FluxExchangeResult<TestResult> = webTestClient.post()
-          .uri("/smoke-test?testMode=SUCCEED")
+          .uri("/smoke-test")
           .accept(TEXT_EVENT_STREAM)
           .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
           .exchange()
@@ -115,8 +114,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
           .expectNext(TestResult("Reset Community test data for X360040"), TestResult("Triggered test for A7742DY"))
           .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
           .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", true))
-          .thenCancel()
-          .verify()
+          .verifyComplete()
 
     }
 
@@ -132,7 +130,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       @Test
       fun `test fails after second step`() {
         val results: FluxExchangeResult<TestResult> = webTestClient.post()
-            .uri("/smoke-test?testMode=SUCCEED")
+            .uri("/smoke-test")
             .accept(TEXT_EVENT_STREAM)
             .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
             .exchange()
@@ -142,8 +140,34 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         StepVerifier.create(results.responseBody)
             .expectNext(TestResult("Reset Community test data for X360040"))
             .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", false))
-            .thenCancel()
-            .verify()
+            .verifyComplete()
+      }
+
+    }
+
+    @Nested
+    @DisplayName("and the trigger erxperiences a server error")
+    inner class WhenTriggerFallsOver {
+      @BeforeEach
+      internal fun setUp() {
+        PrisonApiExtension.prisonApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
+            .withStatus(HttpURLConnection.HTTP_INTERNAL_ERROR)))
+      }
+
+      @Test
+      fun `test fails after second step`() {
+        val results: FluxExchangeResult<TestResult> = webTestClient.post()
+            .uri("/smoke-test")
+            .accept(TEXT_EVENT_STREAM)
+            .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+            .exchange()
+            .expectStatus().isOk
+            .returnResult(TestResult::class.java)
+
+        StepVerifier.create(results.responseBody)
+            .expectNext(TestResult("Reset Community test data for X360040"))
+            .expectNextMatches { testResult -> testResult.description.contains("Trigger for A7742DY failed due to 500 Internal Server Error") }
+            .verifyComplete()
       }
 
     }

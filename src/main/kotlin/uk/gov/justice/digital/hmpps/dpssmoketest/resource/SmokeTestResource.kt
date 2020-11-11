@@ -6,9 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.dpssmoketest.service.SmokeTestService
@@ -30,11 +28,13 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
     ApiResponse(
         responseCode = "403",
         description = "Forbidden, requires role ROLE_SMOKE_TEST"
+    ),
+    ApiResponse(
+        responseCode = "404",
+        description = "Not found, the test data could not be found in prison-api or community-api"
     )
   ])
-  fun smokeTest(@RequestParam(required = false, defaultValue = "SUCCEED") testMode: TestMode): Flux<TestResult> = smokeTestService.runSmokeTest(testMode)
+  fun smokeTest(): Flux<TestResult> = smokeTestService.runSmokeTest()
 
   data class TestResult(val description: String, val outcome: Boolean? = null)
-
-  enum class TestMode { TIMEOUT, FAIL, SUCCEED }
 }

@@ -21,24 +21,13 @@ class CommunityService(
     @Qualifier("communityApiWebClient") private val webClient: WebClient
 ) {
 
-  companion object {
-    val log = LoggerFactory.getLogger(this::class.java)
-  }
+  fun resetTestData(crn: String): Mono<TestResult> {
 
-  /*
-   * The number of times to poll before completing a SUCCEED or FAIL test
-   * e.g. in SmokeTestIntegrationTest this is (2*10*1000)/(3*1000)=6 polls (taking 6 seconds)
-   * e.g. in a Circle build this is (2*600*1000)/(3*10000)=40 polls (taking 400 seconds)
-   */
-  val maxTestPollCount = (2 * testMaxLengthSeconds * 1000) / (3 * testResultPollMs)
-
-  fun resetTestData(crn: String): TestResult {
     fun failIfNotFound(exception: Throwable): Mono<out TestResult> =
         if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Reset Community test failed. The offender $crn can not be found", false)) else Mono.error(exception)
 
     fun failOnError(exception: Throwable): Mono<out TestResult> =
         Mono.just(TestResult("Reset Community test data for $crn failed due to ${exception.message}", false))
-
 
     return webClient.post()
         .uri("/secure/smoketest/offenders/crn/{crn}/custody/reset", crn)
@@ -48,26 +37,20 @@ class CommunityService(
         .map { TestResult("Reset Community test data for $crn") }
         .onErrorResume(::failIfNotFound)
         .onErrorResume(::failOnError)
-        .block() ?: TestResult("Reset Community test data failed", false)
   }
 
   fun checkTestResults(nomsNumber: String, bookNumber: String): Flux<TestResult> {
     return Flux.interval(Duration.ofMillis(testResultPollMs))
         .take(Duration.ofSeconds(testMaxLengthSeconds))
-        .flatMap {
-          checkTestResult(nomsNumber, bookNumber)
-        }
-        .takeWhile {
-          it.testComplete.not()
-        }
-        .map {
-          it.testResult
-        }
+        .flatMap { checkTestResult(nomsNumber, bookNumber) }
+        .takeWhile { it.testComplete.not() }
+        .map { it.testResult }
   }
 
   fun checkTestResult(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
     fun notFoundYetOnNotFound(exception: Throwable): Mono<out TestStatus> =
-        if (exception is WebClientResponseException.NotFound) Mono.just(TestStatus(false, TestResult("Still waiting for offender $nomsNumber with booking $bookNumber to be updated"))) else Mono.error(exception)
+        if (exception is WebClientResponseException.NotFound) Mono.just(TestStatus(false, TestResult("Still waiting for offender $nomsNumber with booking $bookNumber to be updated")))
+        else Mono.error(exception)
 
     return webClient.get()
         .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)

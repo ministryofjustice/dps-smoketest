@@ -13,12 +13,14 @@ class PrisonService (
     @Qualifier("prisonApiWebClient") private val webClient: WebClient
 ){
 
-  fun triggerTest(nomsNumber: String): TestResult {
+  fun triggerTest(nomsNumber: String): Mono<TestResult> {
+
     fun failIfNotFound(exception: Throwable): Mono<out TestResult> =
-        if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Trigger test failed. The offender $nomsNumber can not be found", false)) else Mono.error(exception)
+        if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Trigger test failed. The offender $nomsNumber can not be found", false))
+        else Mono.error(exception)
+
     fun failOnError(exception: Throwable): Mono<out TestResult> =
         Mono.just(TestResult("Trigger for $nomsNumber failed due to ${exception.message}", false))
-
 
     return webClient.post()
         .uri("/api/smoketest/offenders/{nomsNumber}/imprisonment-status", nomsNumber)
@@ -28,7 +30,6 @@ class PrisonService (
         .map { TestResult("Triggered test for $nomsNumber") }
         .onErrorResume(::failIfNotFound)
         .onErrorResume(::failOnError)
-        .block() ?: TestResult("Trigger test for $nomsNumber failed", false)
   }
 
 }

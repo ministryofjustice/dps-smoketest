@@ -28,7 +28,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_OK)))
 
-      service.triggerTest("A7742DY")
+      service.triggerTest("A7742DY").block()
 
       PrisonApiExtension.prisonApi.verify(postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
           .withHeader("Content-Type", equalTo("application/json"))
@@ -40,7 +40,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_OK)))
 
-      assertThat(service.triggerTest("A7742DY").outcome).isNull()
+      assertThat(service.triggerTest("A7742DY").block()?.outcome).isNull()
     }
 
     @Test
@@ -48,7 +48,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_NOT_FOUND)))
 
-      assertThat(service.triggerTest("A7742DY").outcome).isFalse
+      assertThat(service.triggerTest("A7742DY").block()?.outcome).isFalse
     }
 
     @Test
@@ -56,7 +56,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_INTERNAL_ERROR)))
 
-      assertThat(service.triggerTest("A7742DY").outcome).isFalse
+      assertThat(service.triggerTest("A7742DY").block()?.outcome).isFalse
     }
   }
 }
