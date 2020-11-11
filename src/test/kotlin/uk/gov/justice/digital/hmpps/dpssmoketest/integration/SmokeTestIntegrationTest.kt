@@ -26,31 +26,30 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires valid authentication token`() {
       webTestClient.post()
-          .uri("/smoke-test")
-          .accept(TEXT_EVENT_STREAM)
-          .exchange()
-          .expectStatus().isUnauthorized
+        .uri("/smoke-test")
+        .accept(TEXT_EVENT_STREAM)
+        .exchange()
+        .expectStatus().isUnauthorized
     }
 
     @Test
     fun `requires correct role`() {
       webTestClient.post()
-          .uri("/smoke-test")
-          .accept(TEXT_EVENT_STREAM)
-          .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf()))
-          .exchange()
-          .expectStatus().isForbidden
+        .uri("/smoke-test")
+        .accept(TEXT_EVENT_STREAM)
+        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf()))
+        .exchange()
+        .expectStatus().isForbidden
     }
 
     @Test
     fun `succeeds with correct access`() {
       webTestClient.post()
-          .uri("/smoke-test")
-          .accept(TEXT_EVENT_STREAM)
-          .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
-          .exchange()
-          .expectStatus().isOk
-
+        .uri("/smoke-test")
+        .accept(TEXT_EVENT_STREAM)
+        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+        .exchange()
+        .expectStatus().isOk
     }
   }
 
@@ -58,23 +57,27 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class WhenResetFails {
     @BeforeEach
     internal fun setUp() {
-      CommunityApiExtension.communityApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
-          .withStatus(HttpURLConnection.HTTP_NOT_FOUND)))
+      CommunityApiExtension.communityApi.stubFor(
+        WireMock.post(WireMock.anyUrl()).willReturn(
+          WireMock.aResponse()
+            .withStatus(HttpURLConnection.HTTP_NOT_FOUND)
+        )
+      )
     }
 
     @Test
     fun `test fails after first step`() {
       val results: FluxExchangeResult<TestResult> = webTestClient.post()
-          .uri("/smoke-test")
-          .accept(TEXT_EVENT_STREAM)
-          .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
-          .exchange()
-          .expectStatus().isOk
-          .returnResult(TestResult::class.java)
+        .uri("/smoke-test")
+        .accept(TEXT_EVENT_STREAM)
+        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+        .exchange()
+        .expectStatus().isOk
+        .returnResult(TestResult::class.java)
 
       StepVerifier.create(results.responseBody)
-          .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", false))
-          .verifyComplete()
+        .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", false))
+        .verifyComplete()
     }
   }
 
@@ -82,40 +85,54 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class WhenResetSucceeds {
     @BeforeEach
     internal fun setUp() {
-      CommunityApiExtension.communityApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
-          .withStatus(HttpURLConnection.HTTP_OK)))
-      PrisonApiExtension.prisonApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
-          .withStatus(HttpURLConnection.HTTP_OK)))
-      CommunityApiExtension.communityApi.stubFor(WireMock.get(WireMock.anyUrl())
+      CommunityApiExtension.communityApi.stubFor(
+        WireMock.post(WireMock.anyUrl()).willReturn(
+          WireMock.aResponse()
+            .withStatus(HttpURLConnection.HTTP_OK)
+        )
+      )
+      PrisonApiExtension.prisonApi.stubFor(
+        WireMock.post(WireMock.anyUrl()).willReturn(
+          WireMock.aResponse()
+            .withStatus(HttpURLConnection.HTTP_OK)
+        )
+      )
+      CommunityApiExtension.communityApi.stubFor(
+        WireMock.get(WireMock.anyUrl())
           .inScenario("My Scenario")
           .whenScenarioStateIs(STARTED)
-          .willReturn(WireMock.aResponse()
-              .withStatus(HttpURLConnection.HTTP_NOT_FOUND))
-          .willSetStateTo("Found"))
-      CommunityApiExtension.communityApi.stubFor(WireMock.get(WireMock.anyUrl())
+          .willReturn(
+            WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_NOT_FOUND)
+          )
+          .willSetStateTo("Found")
+      )
+      CommunityApiExtension.communityApi.stubFor(
+        WireMock.get(WireMock.anyUrl())
           .inScenario("My Scenario")
           .whenScenarioStateIs("Found")
-          .willReturn(WireMock.aResponse()
-              .withStatus(HttpURLConnection.HTTP_OK)))
-
+          .willReturn(
+            WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_OK)
+          )
+      )
     }
 
     @Test
     fun `test succeeds`() {
       val results: FluxExchangeResult<TestResult> = webTestClient.post()
-          .uri("/smoke-test")
-          .accept(TEXT_EVENT_STREAM)
-          .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
-          .exchange()
-          .expectStatus().isOk
-          .returnResult(TestResult::class.java)
+        .uri("/smoke-test")
+        .accept(TEXT_EVENT_STREAM)
+        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+        .exchange()
+        .expectStatus().isOk
+        .returnResult(TestResult::class.java)
 
       StepVerifier.create(results.responseBody)
-          .expectNext(TestResult("Reset Community test data for X360040"), TestResult("Triggered test for A7742DY"))
-          .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
-          .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", true))
-          .verifyComplete()
-
+        .expectNext(TestResult("Reset Community test data for X360040"), TestResult("Triggered test for A7742DY"))
+        .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
+        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", true))
+        .verifyComplete()
     }
 
     @Nested
@@ -123,26 +140,29 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
     inner class WhenTriggerFails {
       @BeforeEach
       internal fun setUp() {
-        PrisonApiExtension.prisonApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
-            .withStatus(HttpURLConnection.HTTP_NOT_FOUND)))
+        PrisonApiExtension.prisonApi.stubFor(
+          WireMock.post(WireMock.anyUrl()).willReturn(
+            WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_NOT_FOUND)
+          )
+        )
       }
 
       @Test
       fun `test fails after second step`() {
         val results: FluxExchangeResult<TestResult> = webTestClient.post()
-            .uri("/smoke-test")
-            .accept(TEXT_EVENT_STREAM)
-            .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
-            .exchange()
-            .expectStatus().isOk
-            .returnResult(TestResult::class.java)
+          .uri("/smoke-test")
+          .accept(TEXT_EVENT_STREAM)
+          .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+          .exchange()
+          .expectStatus().isOk
+          .returnResult(TestResult::class.java)
 
         StepVerifier.create(results.responseBody)
-            .expectNext(TestResult("Reset Community test data for X360040"))
-            .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", false))
-            .verifyComplete()
+          .expectNext(TestResult("Reset Community test data for X360040"))
+          .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", false))
+          .verifyComplete()
       }
-
     }
 
     @Nested
@@ -150,29 +170,29 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
     inner class WhenTriggerFallsOver {
       @BeforeEach
       internal fun setUp() {
-        PrisonApiExtension.prisonApi.stubFor(WireMock.post(WireMock.anyUrl()).willReturn(WireMock.aResponse()
-            .withStatus(HttpURLConnection.HTTP_INTERNAL_ERROR)))
+        PrisonApiExtension.prisonApi.stubFor(
+          WireMock.post(WireMock.anyUrl()).willReturn(
+            WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_INTERNAL_ERROR)
+          )
+        )
       }
 
       @Test
       fun `test fails after second step`() {
         val results: FluxExchangeResult<TestResult> = webTestClient.post()
-            .uri("/smoke-test")
-            .accept(TEXT_EVENT_STREAM)
-            .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
-            .exchange()
-            .expectStatus().isOk
-            .returnResult(TestResult::class.java)
+          .uri("/smoke-test")
+          .accept(TEXT_EVENT_STREAM)
+          .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+          .exchange()
+          .expectStatus().isOk
+          .returnResult(TestResult::class.java)
 
         StepVerifier.create(results.responseBody)
-            .expectNext(TestResult("Reset Community test data for X360040"))
-            .expectNextMatches { testResult -> testResult.description.contains("Trigger for A7742DY failed due to 500 Internal Server Error") }
-            .verifyComplete()
+          .expectNext(TestResult("Reset Community test data for X360040"))
+          .expectNextMatches { testResult -> testResult.description.contains("Trigger for A7742DY failed due to 500 Internal Server Error") }
+          .verifyComplete()
       }
-
     }
-
   }
-
 }
-

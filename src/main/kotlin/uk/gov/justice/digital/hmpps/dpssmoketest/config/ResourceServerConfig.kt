@@ -19,11 +19,10 @@ class ResourceServerConfig : WebSecurityConfigurerAdapter() {
       csrf { disable() }
       authorizeRequests {
         listOf("/webjars/**", "/favicon.ico", "/health/**", "/info", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
-            .forEach { authorize(AntPathRequestMatcher(it), permitAll) }
+          .forEach { authorize(AntPathRequestMatcher(it), permitAll) }
         authorize(anyRequest)
       }
       oauth2ResourceServer { jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() } }
     }
   }
-
 }

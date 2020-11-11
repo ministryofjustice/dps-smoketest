@@ -29,36 +29,54 @@ class CommunityServiceTest : IntegrationTestBase() {
   inner class ResetTestData {
     @Test
     fun `will call custody reset for offender`() {
-      CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_OK)))
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
 
       service.resetTestData("X12345").block()
 
-      CommunityApiExtension.communityApi.verify(postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/custody/reset"))
+      CommunityApiExtension.communityApi.verify(
+        postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/custody/reset"))
           .withHeader("Content-Type", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE")))
+          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+      )
     }
 
     @Test
     fun `will return a non fail test result`() {
-      CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_OK)))
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
 
       assertThat(service.resetTestData("X12345").block()?.outcome).isNull()
     }
 
     @Test
     fun `will return a fail test result when test data not found`() {
-      CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_NOT_FOUND)))
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_NOT_FOUND)
+        )
+      )
 
       assertThat(service.resetTestData("X12345").block()?.outcome).isFalse
     }
 
     @Test
     fun `will return a fail test result when fails to reset for any reason`() {
-      CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_INTERNAL_ERROR)))
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_INTERNAL_ERROR)
+        )
+      )
 
       assertThat(service.resetTestData("X12345").block()?.outcome).isFalse
     }
@@ -67,37 +85,55 @@ class CommunityServiceTest : IntegrationTestBase() {
   inner class ChecksTestData {
     @Test
     fun `will call to check custody data exists`() {
-      CommunityApiExtension.communityApi.stubFor(get(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_OK)))
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
 
       service.checkTestResult("A7742DY", "38479A").block()
 
-      CommunityApiExtension.communityApi.verify(getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE")))
+      CommunityApiExtension.communityApi.verify(
+        getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+      )
     }
 
     @Test
     fun `will offender is found return that test is complete`() {
-      CommunityApiExtension.communityApi.stubFor(get(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_OK)))
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
 
-      assertThat(service.checkTestResult("X12345","38479A").block()?.testComplete).isTrue
+      assertThat(service.checkTestResult("X12345", "38479A").block()?.testComplete).isTrue
     }
 
     @Test
     fun `will offender is not found return that test is not complete`() {
-      CommunityApiExtension.communityApi.stubFor(get(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_NOT_FOUND)))
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_NOT_FOUND)
+        )
+      )
 
-      assertThat(service.checkTestResult("X12345","38479A").block()?.testComplete).isFalse
+      assertThat(service.checkTestResult("X12345", "38479A").block()?.testComplete).isFalse
     }
 
     @Test
     fun `will return a fail test result when fails to reset for any reason`() {
-      CommunityApiExtension.communityApi.stubFor(get(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_INTERNAL_ERROR)))
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_INTERNAL_ERROR)
+        )
+      )
 
-      assertThatThrownBy {  service.checkTestResult("X12345","38479A").block() }.isInstanceOf(WebClientResponseException::class.java)
+      assertThatThrownBy { service.checkTestResult("X12345", "38479A").block() }.isInstanceOf(WebClientResponseException::class.java)
     }
   }
 }

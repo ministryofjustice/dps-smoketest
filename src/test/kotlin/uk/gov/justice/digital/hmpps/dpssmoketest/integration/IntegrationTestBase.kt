@@ -21,7 +21,6 @@ abstract class IntegrationTestBase {
   @Autowired
   lateinit var webTestClient: WebTestClient
 
-
   init {
     SecurityContextHolder.getContext().authentication = TestingAuthenticationToken("user", "pw")
     // Resolves an issue where Wiremock keeps previous sockets open from other tests causing connection resets

@@ -18,22 +18,24 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
   @PostMapping("/smoke-test", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
   @PreAuthorize("hasRole('SMOKE_TEST')")
   @Operation(
-      summary = "Start a new smoke test"
+    summary = "Start a new smoke test"
   )
-  @ApiResponses(value = [
-    ApiResponse(
+  @ApiResponses(
+    value = [
+      ApiResponse(
         responseCode = "401",
         description = "Unauthorised, requires a valid Oauth2 token"
-    ),
-    ApiResponse(
+      ),
+      ApiResponse(
         responseCode = "403",
         description = "Forbidden, requires role ROLE_SMOKE_TEST"
-    ),
-    ApiResponse(
+      ),
+      ApiResponse(
         responseCode = "404",
         description = "Not found, the test data could not be found in prison-api or community-api"
-    )
-  ])
+      )
+    ]
+  )
   fun smokeTest(): Flux<TestResult> = smokeTestService.runSmokeTest()
 
   data class TestResult(val description: String, val outcome: Boolean? = null)
