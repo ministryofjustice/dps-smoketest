@@ -32,7 +32,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_OK)))
 
-      service.resetTestData("X12345")
+      service.resetTestData("X12345").block()
 
       CommunityApiExtension.communityApi.verify(postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/custody/reset"))
           .withHeader("Content-Type", equalTo("application/json"))
@@ -44,7 +44,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_OK)))
 
-      assertThat(service.resetTestData("X12345").outcome).isNull()
+      assertThat(service.resetTestData("X12345").block()?.outcome).isNull()
     }
 
     @Test
@@ -52,7 +52,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_NOT_FOUND)))
 
-      assertThat(service.resetTestData("X12345").outcome).isFalse
+      assertThat(service.resetTestData("X12345").block()?.outcome).isFalse
     }
 
     @Test
@@ -60,7 +60,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(post(anyUrl()).willReturn(aResponse()
           .withStatus(HTTP_INTERNAL_ERROR)))
 
-      assertThat(service.resetTestData("X12345").outcome).isFalse
+      assertThat(service.resetTestData("X12345").block()?.outcome).isFalse
     }
   }
   @Nested
