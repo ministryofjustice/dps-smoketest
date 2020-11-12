@@ -13,6 +13,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
+  // TODO Pinned due to SSE Emitter bug in spring-web:5.2.10.RELEASE (a dependency of org.springframework.boot:2.3.5.RELEASE) - remove when >= org.springframework.boot:2.3.6.RELEASE
+  implementation("org.springframework:spring-web:5.2.11.RELEASE")
+
   implementation("org.springdoc:springdoc-openapi-ui:1.4.8")
   implementation("org.springdoc:springdoc-openapi-data-rest:1.4.8")
   implementation("org.springdoc:springdoc-openapi-kotlin:1.4.8")
