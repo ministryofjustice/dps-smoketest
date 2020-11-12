@@ -13,6 +13,8 @@ import reactor.test.StepVerifier
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.SUCCESS
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
 import java.net.HttpURLConnection
 
@@ -76,7 +78,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .returnResult(TestResult::class.java)
 
       StepVerifier.create(results.responseBody)
-        .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", false))
+        .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -129,9 +131,10 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .returnResult(TestResult::class.java)
 
       StepVerifier.create(results.responseBody)
-        .expectNext(TestResult("Reset Community test data for X360040"), TestResult("Triggered test for A7742DY"))
+        .expectNext(TestResult("Reset Community test data for X360040"))
+        .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", true))
+        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", SUCCESS))
         .verifyComplete()
     }
 
@@ -160,7 +163,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
         StepVerifier.create(results.responseBody)
           .expectNext(TestResult("Reset Community test data for X360040"))
-          .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", false))
+          .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", FAIL))
           .verifyComplete()
       }
     }

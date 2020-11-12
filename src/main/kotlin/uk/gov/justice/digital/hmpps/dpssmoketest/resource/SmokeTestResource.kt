@@ -38,5 +38,6 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
   )
   fun smokeTest(): Flux<TestResult> = smokeTestService.runSmokeTest()
 
-  data class TestResult(val description: String, val outcome: Boolean? = null)
+  data class TestResult(val description: String, val outcome: Outcome = Outcome.INCOMPLETE)
+  enum class Outcome { INCOMPLETE, SUCCESS, FAIL }
 }
