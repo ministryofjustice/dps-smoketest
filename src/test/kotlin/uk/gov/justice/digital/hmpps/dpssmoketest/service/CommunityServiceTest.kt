@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.INCOMPLETE
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.SUCCESS
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.COMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.INCOMPLETE
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -55,7 +55,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(INCOMPLETE)
+      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -67,7 +67,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(FAIL)
+      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(FAIL)
     }
 
     @Test
@@ -79,7 +79,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(FAIL)
+      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(FAIL)
     }
   }
   @Nested
@@ -93,7 +93,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      service.checkTestResult("A7742DY", "38479A").block()
+      service.checkTestComplete("A7742DY", "38479A").block()
 
       CommunityApiExtension.communityApi.verify(
         getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
@@ -110,7 +110,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(SUCCESS)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(COMPLETE)
     }
 
     @Test
@@ -122,7 +122,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(INCOMPLETE)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -134,7 +134,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(FAIL)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(FAIL)
     }
   }
 }

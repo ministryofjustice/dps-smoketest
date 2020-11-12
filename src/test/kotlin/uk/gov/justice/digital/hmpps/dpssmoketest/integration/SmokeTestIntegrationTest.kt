@@ -13,9 +13,10 @@ import reactor.test.StepVerifier
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.SUCCESS
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.COMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.SUCCESS
 import java.net.HttpURLConnection
 
 class SmokeTestIntegrationTest : IntegrationTestBase() {
@@ -117,6 +118,16 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
             WireMock.aResponse()
               .withStatus(HttpURLConnection.HTTP_OK)
           )
+          .willSetStateTo("Found again")
+      )
+      CommunityApiExtension.communityApi.stubFor(
+        WireMock.get(WireMock.anyUrl())
+          .inScenario("My Scenario")
+          .whenScenarioStateIs("Found again")
+          .willReturn(
+            WireMock.aResponse()
+              .withStatus(HttpURLConnection.HTTP_OK)
+          )
       )
     }
 
@@ -134,7 +145,8 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", SUCCESS))
+        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestResult("Test for offender A7742DY with booking 38479A finished with result", SUCCESS))
         .verifyComplete()
     }
 
