@@ -8,6 +8,8 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.SUCCESS
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
 import java.time.Duration
 
@@ -23,10 +25,13 @@ class CommunityService(
   fun resetTestData(crn: String): Mono<TestResult> {
 
     fun failIfNotFound(exception: Throwable): Mono<out TestResult> =
-      if (exception is WebClientResponseException.NotFound) Mono.just(TestResult("Reset Community test failed. The offender $crn can not be found", false)) else Mono.error(exception)
+      if (exception is WebClientResponseException.NotFound)
+        Mono.just(TestResult("Reset Community test failed. The offender $crn can not be found", FAIL))
+      else
+        Mono.error(exception)
 
     fun failOnError(exception: Throwable): Mono<out TestResult> =
-      Mono.just(TestResult("Reset Community test data for $crn failed due to ${exception.message}", false))
+      Mono.just(TestResult("Reset Community test data for $crn failed due to ${exception.message}", FAIL))
 
     return webClient.post()
       .uri("/secure/smoketest/offenders/crn/{crn}/custody/reset", crn)
@@ -48,14 +53,16 @@ class CommunityService(
 
   fun checkTestResult(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
     fun notFoundYetOnNotFound(exception: Throwable): Mono<out TestStatus> =
-      if (exception is WebClientResponseException.NotFound) Mono.just(TestStatus(false, TestResult("Still waiting for offender $nomsNumber with booking $bookNumber to be updated")))
-      else Mono.error(exception)
+      if (exception is WebClientResponseException.NotFound)
+        Mono.just(TestStatus(false, TestResult("Still waiting for offender $nomsNumber with booking $bookNumber to be updated")))
+      else
+        Mono.error(exception)
 
     return webClient.get()
       .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)
       .retrieve()
       .toBodilessEntity()
-      .map { TestStatus(true, TestResult("Test for offender $nomsNumber with booking $bookNumber has completed successfully", true)) }
+      .map { TestStatus(true, TestResult("Test for offender $nomsNumber with booking $bookNumber has completed successfully", SUCCESS)) }
       .onErrorResume(::notFoundYetOnNotFound)
   }
 }

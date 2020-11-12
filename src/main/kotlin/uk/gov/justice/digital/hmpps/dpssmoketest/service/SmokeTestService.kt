@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.INCOMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
 
 @Service
@@ -17,6 +18,6 @@ class SmokeTestService(
       Flux.from(prisonService.triggerTest("A7742DY")),
       communityService.checkTestResults("A7742DY", "38479A"),
       Flux.from(communityService.checkTestResult("A7742DY", "38479A")).map { it.testResult }
-    ).takeUntil { it.outcome != null }
+    ).takeUntil { it.outcome != INCOMPLETE }
   }
 }

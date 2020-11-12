@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.INCOMPLETE
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -54,7 +56,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isNull()
+      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -66,7 +68,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isFalse
+      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(FAIL)
     }
 
     @Test
@@ -78,7 +80,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isFalse
+      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(FAIL)
     }
   }
   @Nested
