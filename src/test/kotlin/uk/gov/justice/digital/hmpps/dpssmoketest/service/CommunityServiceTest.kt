@@ -9,15 +9,14 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.INCOMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.SUCCESS
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -111,7 +110,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.testComplete).isTrue
+      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(SUCCESS)
     }
 
     @Test
@@ -123,7 +122,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.testComplete).isFalse
+      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -135,7 +134,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThatThrownBy { service.checkTestResult("X12345", "38479A").block() }.isInstanceOf(WebClientResponseException::class.java)
+      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(FAIL)
     }
   }
 }

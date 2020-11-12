@@ -17,7 +17,7 @@ class SmokeTestService(
       Flux.from(communityService.resetTestData("X360040")),
       Flux.from(prisonService.triggerTest("A7742DY")),
       communityService.checkTestResults("A7742DY", "38479A"),
-      Flux.from(communityService.checkTestResult("A7742DY", "38479A")).map { it.testResult }
+      Flux.from(communityService.checkTestResult("A7742DY", "38479A"))
     ).takeUntil { it.outcome != INCOMPLETE }
   }
 }

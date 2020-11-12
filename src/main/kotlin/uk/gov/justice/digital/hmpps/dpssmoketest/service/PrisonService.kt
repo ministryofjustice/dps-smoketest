@@ -16,11 +16,8 @@ class PrisonService(
 
   fun triggerTest(nomsNumber: String): Mono<TestResult> {
 
-    fun failIfNotFound(exception: Throwable): Mono<out TestResult> =
-      if (exception is WebClientResponseException.NotFound)
-        Mono.just(TestResult("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
-      else
-        Mono.error(exception)
+    fun failOnNotFound(): Mono<out TestResult> =
+      Mono.just(TestResult("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
 
     fun failOnError(exception: Throwable): Mono<out TestResult> =
       Mono.just(TestResult("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
@@ -31,7 +28,7 @@ class PrisonService(
       .retrieve()
       .toBodilessEntity()
       .map { TestResult("Triggered test for $nomsNumber") }
-      .onErrorResume(::failIfNotFound)
+      .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
       .onErrorResume(::failOnError)
   }
 }
