@@ -24,8 +24,6 @@ class PrisonApiExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallba
   override fun afterAll(context: ExtensionContext?) {
     prisonApi.stop()
   }
-
-
 }
 class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
   companion object {
@@ -33,10 +31,13 @@ class PrisonApiMockServer : WireMockServer(WIREMOCK_PORT) {
   }
 
   fun stubHealthPing(status: Int) {
-    stubFor(WireMock.get("/health/ping").willReturn(WireMock.aResponse()
-        .withHeader("Content-Type", "application/json")
-        .withBody(if (status == 200) "pong" else "some error")
-        .withStatus(status)))
-
+    stubFor(
+      WireMock.get("/health/ping").willReturn(
+        WireMock.aResponse()
+          .withHeader("Content-Type", "application/json")
+          .withBody(if (status == 200) "pong" else "some error")
+          .withStatus(status)
+      )
+    )
   }
 }

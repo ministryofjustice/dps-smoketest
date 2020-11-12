@@ -25,36 +25,54 @@ class PrisonServiceTest : IntegrationTestBase() {
   inner class TriggerTest {
     @Test
     fun `will call set imprisonment status for the offender`() {
-      PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_OK)))
+      PrisonApiExtension.prisonApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
 
       service.triggerTest("A7742DY").block()
 
-      PrisonApiExtension.prisonApi.verify(postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
+      PrisonApiExtension.prisonApi.verify(
+        postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
           .withHeader("Content-Type", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE")))
+          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+      )
     }
 
     @Test
     fun `will return a non fail test result`() {
-      PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_OK)))
+      PrisonApiExtension.prisonApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
 
       assertThat(service.triggerTest("A7742DY").block()?.outcome).isNull()
     }
 
     @Test
     fun `will return a fail test result when test data not found`() {
-      PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_NOT_FOUND)))
+      PrisonApiExtension.prisonApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_NOT_FOUND)
+        )
+      )
 
       assertThat(service.triggerTest("A7742DY").block()?.outcome).isFalse
     }
 
     @Test
     fun `will return a fail test result when fails to reset for any reason`() {
-      PrisonApiExtension.prisonApi.stubFor(post(anyUrl()).willReturn(aResponse()
-          .withStatus(HTTP_INTERNAL_ERROR)))
+      PrisonApiExtension.prisonApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_INTERNAL_ERROR)
+        )
+      )
 
       assertThat(service.triggerTest("A7742DY").block()?.outcome).isFalse
     }
