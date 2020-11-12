@@ -131,7 +131,8 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .returnResult(TestResult::class.java)
 
       StepVerifier.create(results.responseBody)
-        .expectNext(TestResult("Reset Community test data for X360040"), TestResult("Triggered test for A7742DY"))
+        .expectNext(TestResult("Reset Community test data for X360040"))
+        .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
         .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed successfully", SUCCESS))
         .verifyComplete()
