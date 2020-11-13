@@ -70,7 +70,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `fails after first step`() {
-      val results: FluxExchangeResult<TestResult> = postStartTest()
+      val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
         .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", FAIL))
@@ -89,11 +89,37 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `fails after second step`() {
-      val results: FluxExchangeResult<TestResult> = postStartTest()
+      val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", FAIL))
+        .verifyComplete()
+    }
+  }
+
+  @Nested
+  @DisplayName("When test never completes")
+  inner class TestNeverCompletes {
+    @BeforeEach
+    internal fun setUp() {
+      stubResetTestData()
+      stubTriggerTest()
+      stubTestNeverCompletes()
+    }
+
+    @Test
+    fun `fails on result not found`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody)
+        .expectNext(TestResult("Reset Community test data for X360040"))
+        .expectNext(TestResult("Triggered test for A7742DY"))
+        .expectNextSequence(List(9) { TestResult("Still waiting for offender A7742DY with booking 38479A to be updated") })
+        .expectNextMatches { testResult ->
+          testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
+            testResult.testStatus == FAIL
+        }
         .verifyComplete()
     }
   }
@@ -110,8 +136,8 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `fails on result`() {
-      val results: FluxExchangeResult<TestResult> = postStartTest()
+    fun `fails on result not found`() {
+      val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
         .expectNext(TestResult("Reset Community test data for X360040"))
@@ -147,7 +173,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `fails with incorrect custody details`() {
-      val results: FluxExchangeResult<TestResult> = postStartTest()
+      val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
         .expectNext(TestResult("Reset Community test data for X360040"))
@@ -183,7 +209,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `correct events are returned`() {
-      val results: FluxExchangeResult<TestResult> = postStartTest()
+      val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
         .expectNext(TestResult("Reset Community test data for X360040"))
@@ -240,6 +266,16 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
             .withStatus(HTTP_OK)
         )
         .willSetStateTo("Return results")
+    )
+  }
+
+  private fun stubTestNeverCompletes() {
+    CommunityApiExtension.communityApi.stubFor(
+      WireMock.get(WireMock.anyUrl())
+        .willReturn(
+          WireMock.aResponse()
+            .withStatus(HTTP_NOT_FOUND)
+        )
     )
   }
 
