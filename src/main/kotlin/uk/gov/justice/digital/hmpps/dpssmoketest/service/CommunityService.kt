@@ -39,13 +39,11 @@ class CommunityService(
       .onErrorResume(::failOnError)
   }
 
-  fun waitForTestToComplete(nomsNumber: String, bookNumber: String): Flux<TestResult> {
-    return Flux.interval(Duration.ofMillis(testResultPollMs))
+  fun waitForTestToComplete(nomsNumber: String, bookNumber: String): Flux<TestResult> =
+    Flux.interval(Duration.ofMillis(testResultPollMs))
       .take(Duration.ofSeconds(testMaxLengthSeconds))
       .flatMap { checkTestComplete(nomsNumber, bookNumber) }
       .takeUntil { it.testStatus.testComplete() }
-      .log()
-  }
 
   fun checkTestComplete(nomsNumber: String, bookNumber: String): Mono<TestResult> {
 
@@ -72,7 +70,10 @@ class CommunityService(
     return getCustodyDetails(nomsNumber, bookingNumber).map {
       it.takeIf { it.matches(prisonCode) }
         ?.let { TestResult("Test for offender $nomsNumber with booking $bookingNumber finished with result", SUCCESS) }
-        ?: TestResult("Test for offender $nomsNumber with booking $bookingNumber failed with custodyDetails=$this", FAIL)
+        ?: TestResult(
+          "Test for offender $nomsNumber with booking $bookingNumber failed with custodyDetails=$this",
+          FAIL
+        )
     }
       .onErrorResume(::failOnError)
   }
@@ -81,11 +82,12 @@ class CommunityService(
   private data class Institution(val nomsPrisonInstitutionCode: String)
   private data class Status(val code: String)
 
-  private fun getCustodyDetails(nomsNumber: String, bookNumber: String): Mono<CustodyDetails> = webClient.get()
-    .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)
-    .accept(MediaType.APPLICATION_JSON)
-    .retrieve()
-    .bodyToMono(CustodyDetails::class.java)
+  private fun getCustodyDetails(nomsNumber: String, bookNumber: String): Mono<CustodyDetails> =
+    webClient.get()
+      .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)
+      .accept(MediaType.APPLICATION_JSON)
+      .retrieve()
+      .bodyToMono(CustodyDetails::class.java)
 
   private fun CustodyDetails.matches(prisonCode: String) =
     this.institution.nomsPrisonInstitutionCode == prisonCode &&
