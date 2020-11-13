@@ -64,16 +64,30 @@ class CommunityService(
       .onErrorResume(::failOnError)
   }
 
-  fun assertTestResult(nomsNumber: String, bookNumber: String): Mono<TestResult> {
+  fun assertTestResult(nomsNumber: String, bookingNumber: String, prisonCode: String): Mono<TestResult> {
 
     fun failOnError(exception: Throwable): Mono<out TestResult> =
       Mono.just(TestResult("Check test results for $nomsNumber failed due to ${exception.message}", FAIL))
 
-    return webClient.get()
-      .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)
-      .retrieve()
-      .toBodilessEntity()
-      .map { TestResult("Test for offender $nomsNumber with booking $bookNumber finished with result", SUCCESS) }
+    return getCustodyDetails(nomsNumber, bookingNumber).map {
+      it.takeIf { it.matches(prisonCode) }
+        ?.let { TestResult("Test for offender $nomsNumber with booking $bookingNumber finished with result", SUCCESS) }
+        ?: TestResult("Test for offender $nomsNumber with booking $bookingNumber failed with custodyDetails=$this", FAIL)
+    }
       .onErrorResume(::failOnError)
   }
+
+  private data class CustodyDetails(val bookingNumber: String, val institution: Institution, val status: Status)
+  private data class Institution(val nomsPrisonInstitutionCode: String)
+  private data class Status(val code: String)
+
+  private fun getCustodyDetails(nomsNumber: String, bookNumber: String): Mono<CustodyDetails> = webClient.get()
+    .uri("/secure/offenders/nomsNumber/{nomsNumber}/custody/bookingNumber/{bookingNumber}", nomsNumber, bookNumber)
+    .accept(MediaType.APPLICATION_JSON)
+    .retrieve()
+    .bodyToMono(CustodyDetails::class.java)
+
+  private fun CustodyDetails.matches(prisonCode: String) =
+    this.institution.nomsPrisonInstitutionCode == prisonCode &&
+      this.status.code == "D"
 }

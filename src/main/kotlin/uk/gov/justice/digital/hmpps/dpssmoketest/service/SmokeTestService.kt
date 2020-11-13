@@ -16,7 +16,7 @@ class SmokeTestService(
       Flux.from(communityService.resetTestData("X360040")),
       Flux.from(prisonService.triggerTest("A7742DY")),
       communityService.waitForTestToComplete("A7742DY", "38479A"),
-      Flux.from(communityService.assertTestResult("A7742DY", "38479A"))
+      Flux.from(communityService.assertTestResult("A7742DY", "38479A", "MDI"))
     )
       .takeUntil { it.testStatus.hasResult() }
   }
