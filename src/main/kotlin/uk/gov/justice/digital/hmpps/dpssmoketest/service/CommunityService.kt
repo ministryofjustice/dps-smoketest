@@ -39,10 +39,10 @@ class CommunityService(
       .onErrorResume(::failOnError)
   }
 
-  fun waitForTestToComplete(nomsNumber: String, bookNumber: String): Flux<TestResult> =
+  fun waitForTestToComplete(nomsNumber: String, bookingNumber: String): Flux<TestResult> =
     Flux.interval(Duration.ofMillis(testResultPollMs))
       .take(Duration.ofSeconds(testMaxLengthSeconds))
-      .flatMap { checkTestComplete(nomsNumber, bookNumber) }
+      .flatMap { checkTestComplete(nomsNumber, bookingNumber) }
       .takeUntil { it.testStatus.testComplete() }
 
   fun checkTestComplete(nomsNumber: String, bookNumber: String): Mono<TestResult> {
