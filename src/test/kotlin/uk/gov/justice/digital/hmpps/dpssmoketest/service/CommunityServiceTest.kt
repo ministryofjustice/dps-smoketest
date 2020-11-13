@@ -11,12 +11,17 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders.CONTENT_TYPE
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.INCOMPLETE
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Outcome.SUCCESS
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.COMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.INCOMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.SUCCESS
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -55,7 +60,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(INCOMPLETE)
+      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -67,7 +72,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(FAIL)
+      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(FAIL)
     }
 
     @Test
@@ -79,9 +84,10 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.outcome).isEqualTo(FAIL)
+      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(FAIL)
     }
   }
+
   @Nested
   inner class ChecksTestData {
     @Test
@@ -93,7 +99,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      service.checkTestResult("A7742DY", "38479A").block()
+      service.checkTestComplete("A7742DY", "38479A").block()
 
       CommunityApiExtension.communityApi.verify(
         getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
@@ -110,7 +116,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(SUCCESS)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(COMPLETE)
     }
 
     @Test
@@ -122,7 +128,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(INCOMPLETE)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -134,7 +140,88 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestResult("X12345", "38479A").block()?.outcome).isEqualTo(FAIL)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(FAIL)
+    }
+  }
+
+  @Nested
+  inner class AssertTestResult {
+
+    @Test
+    fun `will fail on not found`() {
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .withStatus(HTTP_NOT_FOUND)
+        )
+      )
+
+      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.testStatus).isEqualTo(FAIL)
+    }
+
+    @Test
+    fun `will fail on server error`() {
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .withStatus(HTTP_INTERNAL_ERROR)
+        )
+      )
+
+      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.testStatus).isEqualTo(FAIL)
+    }
+
+    @Test
+    fun `will succeed with matching data`() {
+      CommunityApiExtension.communityApi.stubFor(
+        get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/38479A")).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+            .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .withBody(
+              """
+              { "bookingNumber": "38479A",
+                "institution": { "nomsPrisonInstitutionCode": "MDI" },
+                "status": { "code": "D" }
+              }
+              """.trimIndent()
+            )
+        )
+      )
+
+      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.testStatus).isEqualTo(SUCCESS)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+      "X12345, 38479A, WRONG",
+      "X12345, WRONG,  MDI",
+      "WRONG,  38479A, MDI",
+    )
+    fun `will fail with bad data`(
+      nomsNumber: String,
+      bookingNumber: String,
+      prisonCode: String
+    ) {
+      CommunityApiExtension.communityApi.stubFor(
+        get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/38479A")).willReturn(
+          aResponse()
+            .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .withStatus(HTTP_OK)
+            .withBody(
+              """
+              { "bookingNumber": "38479A",
+                "institution": { "nomsPrisonInstitutionCode": "MDI" },
+                "status": { "code": "D" }
+              }
+              """.trimIndent()
+            )
+        )
+      )
+
+      assertThat(service.assertTestResult(nomsNumber, bookingNumber, prisonCode).block()?.testStatus).isEqualTo(FAIL)
     }
   }
 }
