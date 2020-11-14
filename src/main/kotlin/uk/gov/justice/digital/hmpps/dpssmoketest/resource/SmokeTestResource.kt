@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.resource
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -52,6 +53,7 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
           hmpps-auth is providing tokens to access prison-api
           prison-api allows us to query Nomis
           prison-to-probation-update matching is working
+          probation-offender-search is working
           hmpps-auth is providing tokens to access community-api
           communty-api allows us to update Delius
       """
@@ -77,7 +79,17 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
     ) @NotNull @PathVariable(value = "testProfile") testProfile: String
   ): Flux<TestResult> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.valueOf(testProfile).profile)
 
-  data class TestResult(val description: String, val testStatus: TestStatus = TestStatus.INCOMPLETE)
+  @Schema(description = "One of a sequence of results signalling the status of the test. The last result should have testStatus SUCCESS or FAIL if the test concluded.")
+  data class TestResult(
+    @Schema(description = "Human readable description of the latest test result")
+    val description: String,
+    @Schema(description = "The current status of the test")
+    val testStatus: TestStatus = TestStatus.INCOMPLETE
+  ) {
+    fun testComplete() = testStatus.testComplete()
+    fun hasResult() = testStatus.hasResult()
+  }
+  @Schema(description = "The current status of the test")
   enum class TestStatus {
     INCOMPLETE, COMPLETE, SUCCESS, FAIL;
 

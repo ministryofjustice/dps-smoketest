@@ -43,7 +43,7 @@ class CommunityService(
     Flux.interval(Duration.ofMillis(testResultPollMs))
       .take(Duration.ofSeconds(testMaxLengthSeconds))
       .flatMap { checkTestComplete(nomsNumber, bookingNumber) }
-      .takeUntil { it.testStatus.testComplete() }
+      .takeUntil(TestResult::testComplete)
 
   fun checkTestComplete(nomsNumber: String, bookNumber: String): Mono<TestResult> {
 

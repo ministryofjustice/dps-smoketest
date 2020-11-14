@@ -61,10 +61,32 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   }
 
   @Nested
+  @DisplayName("When get test inputs fails")
+  inner class WhenGetTestInputsFails {
+    @BeforeEach
+    internal fun setUp() {
+      stubGetTestInputs(HTTP_NOT_FOUND)
+    }
+
+    @Test
+    fun `fails after first step`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult ->
+          testResult.description.contains("Unable to gather the test inputs due to exception ") &&
+            testResult.testStatus == FAIL
+        }
+        .verifyComplete()
+    }
+  }
+
+  @Nested
   @DisplayName("When reset test fails")
   inner class WhenResetFails {
     @BeforeEach
     internal fun setUp() {
+      stubGetTestInputs()
       stubResetTestData(HTTP_NOT_FOUND)
     }
 
@@ -73,6 +95,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
         .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", FAIL))
         .verifyComplete()
     }
@@ -83,6 +106,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class WhenTriggerFails {
     @BeforeEach
     internal fun setUp() {
+      stubGetTestInputs()
       stubResetTestData()
       stubTriggerTest(HTTP_NOT_FOUND)
     }
@@ -92,6 +116,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", FAIL))
         .verifyComplete()
@@ -103,6 +128,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class TestNeverCompletes {
     @BeforeEach
     internal fun setUp() {
+      stubGetTestInputs()
       stubResetTestData()
       stubTriggerTest()
       stubTestNeverCompletes()
@@ -113,6 +139,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNextSequence(List(9) { TestResult("Still waiting for offender A7742DY with booking 38479A to be updated") })
@@ -129,6 +156,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class ResultsNotFound {
     @BeforeEach
     internal fun setUp() {
+      stubGetTestInputs()
       stubResetTestData()
       stubTriggerTest()
       stubTestComplete()
@@ -140,6 +168,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
@@ -157,6 +186,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class TestResultDataBad {
     @BeforeEach
     internal fun setUp() {
+      stubGetTestInputs()
       stubResetTestData()
       stubTriggerTest()
       stubTestComplete()
@@ -176,6 +206,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
@@ -193,6 +224,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
   inner class TestSucceeds {
     @BeforeEach
     internal fun setUp() {
+      stubGetTestInputs()
       stubResetTestData()
       stubTriggerTest()
       stubTestComplete()
@@ -212,6 +244,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
         .expectNext(TestResult("Reset Community test data for X360040"))
         .expectNext(TestResult("Triggered test for A7742DY"))
         .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
@@ -230,6 +263,19 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       .expectStatus().isOk
       .returnResult(TestResult::class.java)
 
+  private fun stubGetTestInputs(status: Int = HTTP_OK) =
+    PrisonApiExtension.prisonApi.stubFor(
+      WireMock.get(WireMock.anyUrl()).willReturn(
+        WireMock.aResponse()
+          .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+          .withStatus(status)
+          .withBody(
+            """
+            { "bookingNo": "38479A", "agencyId": "MDI" }
+            """.trimIndent()
+          )
+      )
+    )
   private fun stubResetTestData(status: Int = HTTP_OK) =
     CommunityApiExtension.communityApi.stubFor(
       WireMock.post(WireMock.anyUrl()).willReturn(
