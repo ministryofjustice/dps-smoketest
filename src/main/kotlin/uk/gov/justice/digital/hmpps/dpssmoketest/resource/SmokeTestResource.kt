@@ -40,7 +40,7 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
       )
     ]
   )
-  fun smokeTest(): Flux<TestResult> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.PTPU_T3.profile)
+  fun smokeTest(): Flux<TestStatus> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.PTPU_T3.profile)
 
   @PostMapping("/smoke-test/prison-to-probation-update/{testProfile}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
   @PreAuthorize("hasRole('SMOKE_TEST')")
@@ -77,23 +77,21 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
       example = "PTPU_T3",
       required = true
     ) @NotNull @PathVariable(value = "testProfile") testProfile: String
-  ): Flux<TestResult> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.valueOf(testProfile).profile)
+  ): Flux<TestStatus> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.valueOf(testProfile).profile)
 
-  @Schema(description = "One of a sequence of results signalling the status of the test. The last result should have testStatus SUCCESS or FAIL if the test concluded.")
-  data class TestResult(
-    @Schema(description = "Human readable description of the latest test result")
+  @Schema(description = "One of a sequence of results signalling the status of the test. The last result should have progress SUCCESS or FAIL if the test concluded.")
+  data class TestStatus(
+    @Schema(description = "Human readable description of the latest test status")
     val description: String,
-    @Schema(description = "The current status of the test")
-    val testStatus: TestStatus = TestStatus.INCOMPLETE
+    @Schema(description = "The current progress of the test")
+    val progress: TestProgress = TestProgress.INCOMPLETE
   ) {
-    fun testComplete() = testStatus.testComplete()
-    fun hasResult() = testStatus.hasResult()
-  }
-  @Schema(description = "The current status of the test")
-  enum class TestStatus {
-    INCOMPLETE, COMPLETE, SUCCESS, FAIL;
+    fun testComplete() = this.progress != TestProgress.INCOMPLETE
+    fun hasResult() = this.progress == TestProgress.SUCCESS || this.progress == TestProgress.FAIL
 
-    fun testComplete() = this != INCOMPLETE
-    fun hasResult() = this == SUCCESS || this == FAIL
+    @Schema(description = "The current progress of a test")
+    enum class TestProgress {
+      INCOMPLETE, COMPLETE, SUCCESS, FAIL;
+    }
   }
 }

@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.INCOMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.INCOMPLETE
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -52,7 +52,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.triggerTest("A7742DY").block()?.testStatus).isEqualTo(INCOMPLETE)
+      assertThat(service.triggerTest("A7742DY").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -64,7 +64,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.triggerTest("A7742DY").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.triggerTest("A7742DY").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -76,7 +76,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.triggerTest("A7742DY").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.triggerTest("A7742DY").block()?.progress).isEqualTo(FAIL)
     }
   }
 }

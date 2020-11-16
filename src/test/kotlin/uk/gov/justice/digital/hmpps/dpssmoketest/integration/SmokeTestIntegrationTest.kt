@@ -15,10 +15,10 @@ import reactor.test.StepVerifier
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.COMPLETE
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.SUCCESS
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
@@ -75,7 +75,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult ->
           testResult.description.contains("Unable to gather the test inputs due to exception ") &&
-            testResult.testStatus == FAIL
+            testResult.progress == FAIL
         }
         .verifyComplete()
     }
@@ -96,7 +96,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestResult("Reset Community test failed. The offender X360040 can not be found", FAIL))
+        .expectNext(TestStatus("Reset Community test failed. The offender X360040 can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -117,8 +117,8 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestResult("Reset Community test data for X360040"))
-        .expectNext(TestResult("Trigger test failed. The offender A7742DY can not be found", FAIL))
+        .expectNext(TestStatus("Reset Community test data for X360040"))
+        .expectNext(TestStatus("Trigger test failed. The offender A7742DY can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -140,12 +140,12 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestResult("Reset Community test data for X360040"))
-        .expectNext(TestResult("Triggered test for A7742DY"))
-        .expectNextSequence(List(9) { TestResult("Still waiting for offender A7742DY with booking 38479A to be updated") })
+        .expectNext(TestStatus("Reset Community test data for X360040"))
+        .expectNext(TestStatus("Triggered test for A7742DY"))
+        .expectNextSequence(List(9) { TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated") })
         .expectNextMatches { testResult ->
           testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
-            testResult.testStatus == FAIL
+            testResult.progress == FAIL
         }
         .verifyComplete()
     }
@@ -169,13 +169,13 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestResult("Reset Community test data for X360040"))
-        .expectNext(TestResult("Triggered test for A7742DY"))
-        .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Reset Community test data for X360040"))
+        .expectNext(TestStatus("Triggered test for A7742DY"))
+        .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
+        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
         .expectNextMatches { testResult ->
           testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
-            testResult.testStatus == FAIL
+            testResult.progress == FAIL
         }
         .verifyComplete()
     }
@@ -183,7 +183,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Nested
   @DisplayName("When test result data incorrect")
-  inner class TestResultDataBad {
+  inner class TestStatusDataBad {
     @BeforeEach
     internal fun setUp() {
       stubGetTestInputs()
@@ -207,13 +207,13 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestResult("Reset Community test data for X360040"))
-        .expectNext(TestResult("Triggered test for A7742DY"))
-        .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Reset Community test data for X360040"))
+        .expectNext(TestStatus("Triggered test for A7742DY"))
+        .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
+        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
         .expectNextMatches { testResult ->
           testResult.description.contains("Test for offender A7742DY with booking 38479A failed with custodyDetails") &&
-            testResult.testStatus == FAIL
+            testResult.progress == FAIL
         }
         .verifyComplete()
     }
@@ -245,23 +245,23 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestResult("Reset Community test data for X360040"))
-        .expectNext(TestResult("Triggered test for A7742DY"))
-        .expectNext(TestResult("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestResult("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
-        .expectNext(TestResult("Test for offender A7742DY with booking 38479A finished with result", SUCCESS))
+        .expectNext(TestStatus("Reset Community test data for X360040"))
+        .expectNext(TestStatus("Triggered test for A7742DY"))
+        .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
+        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A finished with result", SUCCESS))
         .verifyComplete()
     }
   }
 
-  private fun postStartTest(): FluxExchangeResult<TestResult> =
+  private fun postStartTest(): FluxExchangeResult<TestStatus> =
     webTestClient.post()
       .uri("/smoke-test")
       .accept(TEXT_EVENT_STREAM)
       .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
       .exchange()
       .expectStatus().isOk
-      .returnResult(TestResult::class.java)
+      .returnResult(TestStatus::class.java)
 
   private fun stubGetTestInputs(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
