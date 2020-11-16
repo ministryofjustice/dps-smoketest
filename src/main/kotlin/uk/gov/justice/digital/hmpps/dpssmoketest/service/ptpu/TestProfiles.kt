@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.dpssmoketest.resource
+package uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu
 
 data class PtpuTestParameters(val crn: String, val nomsNumber: String)
 

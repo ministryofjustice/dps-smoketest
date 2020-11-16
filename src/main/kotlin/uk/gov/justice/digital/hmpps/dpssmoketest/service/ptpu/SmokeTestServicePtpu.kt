@@ -1,19 +1,18 @@
-package uk.gov.justice.digital.hmpps.dpssmoketest.service
+package uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.PtpuTestParameters
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 
 data class PtpuTestInputs(val crn: String, val nomsNumber: String, val bookingNumber: String, val prisonCode: String, val testStatus: TestStatus)
 
 @Service
-class SmokeTestService(
+class SmokeTestServicePtpu(
   private val prisonService: PrisonService,
   private val communityService: CommunityService,
 ) {
 
-  fun runSmokeTestPtpu(testProfile: PtpuTestParameters): Flux<TestStatus> {
+  fun runSmokeTest(testProfile: PtpuTestParameters): Flux<TestStatus> {
     return Flux.from(prisonService.getTestInputs(testProfile.nomsNumber, testProfile.crn))
       .flatMap {
         Flux.concat(

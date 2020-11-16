@@ -12,35 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
-import uk.gov.justice.digital.hmpps.dpssmoketest.service.SmokeTestService
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.PtpuTestProfiles
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.SmokeTestServicePtpu
 import javax.validation.constraints.NotNull
 
 @Tag(name = "DPS Smoke Tests")
 @RestController
-class SmokeTestResource(private val smokeTestService: SmokeTestService) {
-
-  @PostMapping("/smoke-test", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-  @PreAuthorize("hasRole('SMOKE_TEST')")
-  @Operation(
-    summary = "Start a new smoke test"
-  )
-  @ApiResponses(
-    value = [
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorised, requires a valid Oauth2 token"
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden, requires role ROLE_SMOKE_TEST"
-      ),
-      ApiResponse(
-        responseCode = "404",
-        description = "Not found, the test data could not be found in prison-api or community-api"
-      )
-    ]
-  )
-  fun smokeTest(): Flux<TestStatus> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.PTPU_T3.profile)
+class SmokeTestResource(private val smokeTestServicePtpu: SmokeTestServicePtpu) {
 
   @PostMapping("/smoke-test/prison-to-probation-update/{testProfile}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
   @PreAuthorize("hasRole('SMOKE_TEST')")
@@ -77,9 +55,9 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
       example = "PTPU_T3",
       required = true
     ) @NotNull @PathVariable(value = "testProfile") testProfile: String
-  ): Flux<TestStatus> = smokeTestService.runSmokeTestPtpu(PtpuTestProfiles.valueOf(testProfile).profile)
+  ): Flux<TestStatus> = smokeTestServicePtpu.runSmokeTest(PtpuTestProfiles.valueOf(testProfile).profile)
 
-  @Schema(description = "One of a sequence of results signalling the status of the test. The last result should have progress SUCCESS or FAIL if the test concluded.")
+  @Schema(description = "One of a sequence test statuses. The last status should have progress SUCCESS or FAIL if the test concluded.")
   data class TestStatus(
     @Schema(description = "Human readable description of the latest test status")
     val description: String,
