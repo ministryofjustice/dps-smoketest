@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -31,6 +33,7 @@ class PrisonService(
 
     return webClient.get()
       .uri("/api/smoketest/offenders/{nomsNumber}/imprisonment-status", nomsNumber)
+      .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
       .retrieve()
       .bodyToMono(OffenderDetails::class.java)
       .map {
