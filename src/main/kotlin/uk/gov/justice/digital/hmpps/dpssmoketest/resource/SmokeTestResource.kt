@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
 import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.PtpuTestProfiles
 import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.SmokeTestServicePtpu
 import javax.validation.constraints.NotNull
@@ -55,7 +56,9 @@ class SmokeTestResource(private val smokeTestServicePtpu: SmokeTestServicePtpu) 
       example = "PTPU_T3",
       required = true
     ) @NotNull @PathVariable(value = "testProfile") testProfile: String
-  ): Flux<TestStatus> = smokeTestServicePtpu.runSmokeTest(PtpuTestProfiles.valueOf(testProfile).profile)
+  ): Flux<TestStatus> = runCatching { PtpuTestProfiles.valueOf(testProfile).profile }
+    .map { smokeTestServicePtpu.runSmokeTest(it) }
+    .getOrDefault(Flux.just(TestStatus("Unknown test profile $testProfile", FAIL)))
 
   @Schema(description = "One of a sequence test statuses. The last status should have progress SUCCESS or FAIL if the test concluded.")
   data class TestStatus(
@@ -65,7 +68,7 @@ class SmokeTestResource(private val smokeTestServicePtpu: SmokeTestServicePtpu) 
     val progress: TestProgress = TestProgress.INCOMPLETE
   ) {
     fun testComplete() = this.progress != TestProgress.INCOMPLETE
-    fun hasResult() = this.progress == TestProgress.SUCCESS || this.progress == TestProgress.FAIL
+    fun hasResult() = this.progress == TestProgress.SUCCESS || this.progress == FAIL
 
     @Schema(description = "The current progress of a test")
     enum class TestProgress {
