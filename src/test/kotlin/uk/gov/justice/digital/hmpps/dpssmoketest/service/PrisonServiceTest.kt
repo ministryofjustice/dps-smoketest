@@ -107,7 +107,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       service.getTestInputs("A7742DY", "X360040").block()
 
       PrisonApiExtension.prisonApi.verify(
-        getRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
+        getRequestedFor(urlEqualTo("/api/bookings/offenderNo/A7742DY"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("Bearer ABCDE"))
       )

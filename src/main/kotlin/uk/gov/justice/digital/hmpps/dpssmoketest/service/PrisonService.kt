@@ -50,7 +50,7 @@ class PrisonService(
       )
 
     return webClient.get()
-      .uri("/api/smoketest/offenders/{nomsNumber}/imprisonment-status", nomsNumber)
+      .uri("/api/bookings/offenderNo/{offenderNo}", nomsNumber)
       .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
       .retrieve()
       .bodyToMono(OffenderDetails::class.java)
