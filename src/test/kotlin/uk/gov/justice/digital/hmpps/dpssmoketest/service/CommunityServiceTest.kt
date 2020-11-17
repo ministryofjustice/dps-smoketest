@@ -18,10 +18,11 @@ import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.COMPLETE
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.INCOMPLETE
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.SUCCESS
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.INCOMPLETE
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.CommunityService
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -60,7 +61,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(INCOMPLETE)
+      assertThat(service.resetTestData("X12345").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -72,7 +73,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.resetTestData("X12345").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -84,7 +85,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.resetTestData("X12345").block()?.progress).isEqualTo(FAIL)
     }
   }
 
@@ -116,7 +117,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(COMPLETE)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.progress).isEqualTo(COMPLETE)
     }
 
     @Test
@@ -128,7 +129,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(INCOMPLETE)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -140,12 +141,12 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestComplete("X12345", "38479A").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.checkTestComplete("X12345", "38479A").block()?.progress).isEqualTo(FAIL)
     }
   }
 
   @Nested
-  inner class AssertTestResult {
+  inner class AssertTestStatus {
 
     @Test
     fun `will fail on not found`() {
@@ -157,7 +158,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -170,7 +171,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -191,7 +192,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.testStatus).isEqualTo(SUCCESS)
+      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(SUCCESS)
     }
 
     @ParameterizedTest
@@ -221,7 +222,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.assertTestResult(nomsNumber, bookingNumber, prisonCode).block()?.testStatus).isEqualTo(FAIL)
+      assertThat(service.assertTestResult(nomsNumber, bookingNumber, prisonCode).block()?.progress).isEqualTo(FAIL)
     }
   }
 }

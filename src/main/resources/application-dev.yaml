@@ -18,3 +18,8 @@ community:
 test:
   maxLengthSeconds: 10
   resultPollMs: 1000
+
+smoketest:
+  client:
+    client-id: smoke-test-client
+    client-secret: password123456

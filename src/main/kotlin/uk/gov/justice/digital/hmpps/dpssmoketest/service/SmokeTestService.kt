@@ -2,7 +2,10 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestResult
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.CommunityService
+
+data class PtpuTestInputs(val crn: String, val nomsNumber: String, val bookingNumber: String, val prisonCode: String, val testStatus: SmokeTestResource.TestStatus)
 
 @Service
 class SmokeTestService(
@@ -10,14 +13,18 @@ class SmokeTestService(
   private val communityService: CommunityService,
 ) {
 
-  fun runSmokeTest(): Flux<TestResult> {
-
-    return Flux.concat(
-      Flux.from(communityService.resetTestData("X360040")),
-      Flux.from(prisonService.triggerTest("A7742DY")),
-      communityService.waitForTestToComplete("A7742DY", "38479A"),
-      Flux.from(communityService.assertTestResult("A7742DY", "38479A", "MDI"))
-    )
-      .takeUntil { it.testStatus.hasResult() }
+  fun runSmokeTest(testProfile: PtpuTestParameters): Flux<SmokeTestResource.TestStatus> {
+    return Flux.from(prisonService.getTestInputs(testProfile.nomsNumber, testProfile.crn))
+      .flatMap {
+        Flux.concat(
+          Flux.just(it.testStatus),
+          Flux.from(communityService.resetTestData(it.crn)),
+          Flux.from(prisonService.triggerTest(it.nomsNumber)),
+          communityService.waitForTestToComplete(it.nomsNumber, it.bookingNumber),
+          Flux.from(
+            communityService.assertTestResult(it.nomsNumber, it.bookingNumber, it.prisonCode)
+          )
+        ).takeUntil(SmokeTestResource.TestStatus::hasResult)
+      }
   }
 }
