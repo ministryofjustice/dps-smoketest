@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.service.PtpuTestProfiles
-import uk.gov.justice.digital.hmpps.dpssmoketest.service.SmokeTestService
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.PtpuSmokeTestService
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.PtpuTestProfiles
 import javax.validation.constraints.NotNull
 
 @Tag(name = "DPS Smoke Tests")
 @RestController
-class SmokeTestResource(private val smokeTestService: SmokeTestService) {
+class SmokeTestResource(private val ptpuSmokeTestService: PtpuSmokeTestService) {
 
   @PostMapping("/smoke-test/prison-to-probation-update/{testProfile}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
   @PreAuthorize("hasRole('SMOKE_TEST')")
@@ -57,7 +57,7 @@ class SmokeTestResource(private val smokeTestService: SmokeTestService) {
       required = true
     ) @NotNull @PathVariable(value = "testProfile") testProfile: String
   ): Flux<TestStatus> = runCatching { PtpuTestProfiles.valueOf(testProfile).profile }
-    .map { smokeTestService.runSmokeTest(it) }
+    .map { ptpuSmokeTestService.runSmokeTest(it) }
     .getOrDefault(Flux.just(TestStatus("Unknown test profile $testProfile", FAIL)))
 
   @Schema(description = "One of a sequence test statuses. The last status should have progress SUCCESS or FAIL if the test concluded.")

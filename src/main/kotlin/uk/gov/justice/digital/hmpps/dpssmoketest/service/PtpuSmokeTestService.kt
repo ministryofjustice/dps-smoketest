@@ -4,11 +4,13 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource
 import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.CommunityService
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.PrisonService
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.PtpuTestParameters
 
 data class PtpuTestInputs(val crn: String, val nomsNumber: String, val bookingNumber: String, val prisonCode: String, val testStatus: SmokeTestResource.TestStatus)
 
 @Service
-class SmokeTestService(
+class PtpuSmokeTestService(
   private val prisonService: PrisonService,
   private val communityService: CommunityService,
 ) {

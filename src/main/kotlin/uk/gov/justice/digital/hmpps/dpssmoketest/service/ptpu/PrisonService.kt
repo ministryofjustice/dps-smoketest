@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.dpssmoketest.service
+package uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.PtpuTestInputs
 
 @Service
 class PrisonService(
