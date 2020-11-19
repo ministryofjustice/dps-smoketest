@@ -69,7 +69,7 @@ class CommunityService(
 
     return getCustodyDetails(nomsNumber, bookingNumber).map {
       it.takeIf { it.matches(prisonCode) }
-        ?.let { TestStatus("Test for offender $nomsNumber with booking $bookingNumber finished with result", SUCCESS) }
+        ?.let { TestStatus("Test for offender $nomsNumber with booking $bookingNumber finished successfully", SUCCESS) }
         ?: TestStatus(
           "Test for offender $nomsNumber with booking $bookingNumber failed with custodyDetails=$this",
           FAIL

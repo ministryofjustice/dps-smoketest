@@ -264,7 +264,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Triggered test for A7742DY"))
         .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
         .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
-        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A finished with result", SUCCESS))
+        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A finished successfully", SUCCESS))
         .verifyComplete()
     }
   }
