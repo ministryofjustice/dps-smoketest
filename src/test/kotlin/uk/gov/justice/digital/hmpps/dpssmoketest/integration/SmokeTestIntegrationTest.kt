@@ -158,6 +158,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Reset Community test data for X360040"))
         .expectNext(TestStatus("Triggered test for A7742DY"))
         .expectNextSequence(List(9) { TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated") })
+        .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNextMatches { testResult ->
           testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
             testResult.progress == FAIL
@@ -188,6 +189,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Triggered test for A7742DY"))
         .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
         .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNextMatches { testResult ->
           testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
             testResult.progress == FAIL
@@ -226,6 +228,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Triggered test for A7742DY"))
         .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
         .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNextMatches { testResult ->
           testResult.description.contains("Test for offender A7742DY with booking 38479A failed with custodyDetails") &&
             testResult.progress == FAIL
@@ -264,6 +267,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Triggered test for A7742DY"))
         .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
         .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNext(TestStatus("Test for offender A7742DY with booking 38479A finished successfully", SUCCESS))
         .verifyComplete()
     }

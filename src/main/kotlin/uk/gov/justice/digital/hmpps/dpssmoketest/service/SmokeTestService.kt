@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
+import org.reactivestreams.Publisher
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -24,12 +25,16 @@ class SmokeTestService(
           Flux.from(communityService.resetTestData(it.crn)),
           Flux.from(prisonService.triggerTest(it.nomsNumber)),
           communityService.waitForTestToComplete(it.nomsNumber, it.bookingNumber),
-          Flux.interval(Duration.ofMillis(1000))
-            .flatMap { Mono.just(TestStatus("Waiting for final update", COMPLETE)) },
+          waitForUpdates(),
           Flux.from(
             communityService.assertTestResult(it.nomsNumber, it.bookingNumber, it.prisonCode)
           )
-        ).takeUntil(TestStatus::hasResult)
+        ).log().takeUntil(TestStatus::hasResult)
       }
   }
+
+  private fun waitForUpdates(): Publisher<out TestStatus> =
+    Flux.interval(Duration.ofMillis(1000))
+      .take(1)
+      .flatMap { Mono.just(TestStatus("Waiting for final update", COMPLETE)) }
 }
