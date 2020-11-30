@@ -29,7 +29,7 @@ class SmokeTestService(
           Flux.from(
             communityService.assertTestResult(it.nomsNumber, it.bookingNumber, it.prisonCode)
           )
-        ).log().takeUntil(TestStatus::hasResult)
+        ).takeUntil(TestStatus::hasResult)
       }
   }
 
