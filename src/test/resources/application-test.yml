@@ -32,3 +32,6 @@ oauth:
 
 community:
   endpoint.url: http://localhost:8096
+
+probationoffendersearch:
+  endpoint.url: http://localhost:8097

@@ -6,13 +6,18 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
-import uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu.CommunityService
 import java.time.Duration
 
-data class PtpuTestInputs(val crn: String, val nomsNumber: String, val bookingNumber: String, val prisonCode: String, val testStatus: TestStatus)
+data class PtpuTestInputs(
+  val crn: String,
+  val nomsNumber: String,
+  val bookingNumber: String,
+  val prisonCode: String,
+  val testStatus: TestStatus
+)
 
 @Service
-class SmokeTestService(
+class PtpuSmokeTestService(
   private val prisonService: PrisonService,
   private val communityService: CommunityService,
 ) {

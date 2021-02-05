@@ -31,6 +31,9 @@ env:
   - name: COMMUNITY_ENDPOINT_URL
     value: "{{ .Values.env.COMMUNITY_ENDPOINT_URL }}"
 
+  - name: PROBATIONOFFENDERSEARCH_ENDPOINT_URL
+    value: "{{ .Values.env.PROBATIONOFFENDERSEARCH_ENDPOINT_URL }}"
+
   - name: SPRING_PROFILES_ACTIVE
     value: "logstash"
 
