@@ -17,6 +17,7 @@ class WebClientConfiguration(
   @Value("\${community.endpoint.url}") private val communityRootUri: String,
   @Value("\${prisonapi.endpoint.url}") private val prisonapiRootUri: String,
   @Value("\${oauth.endpoint.url}") private val oauthRootUri: String,
+  @Value("\${probationoffendersearch.endpoint.url}") private val probationOffenderSearchUri: String,
   private val webClientBuilder: WebClient.Builder
 ) {
 
@@ -46,6 +47,25 @@ class WebClientConfiguration(
 
     return webClientBuilder
       .baseUrl(prisonapiRootUri)
+      .apply(oauth2Client.oauth2Configuration())
+      .exchangeStrategies(
+        ExchangeStrategies.builder()
+          .codecs { configurer ->
+            configurer.defaultCodecs()
+              .maxInMemorySize(-1)
+          }
+          .build()
+      )
+      .build()
+  }
+
+  @Bean
+  fun probationOffenderSearchWebClient(authorizedClientManager: OAuth2AuthorizedClientManager): WebClient {
+    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+    oauth2Client.setDefaultClientRegistrationId("probation-offender-search")
+
+    return webClientBuilder
+      .baseUrl(probationOffenderSearchUri)
       .apply(oauth2Client.oauth2Configuration())
       .exchangeStrategies(
         ExchangeStrategies.builder()

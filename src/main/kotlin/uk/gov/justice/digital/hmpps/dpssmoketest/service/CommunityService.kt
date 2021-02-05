@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.dpssmoketest.service.ptpu
+package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value

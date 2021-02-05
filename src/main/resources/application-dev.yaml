@@ -15,6 +15,9 @@ prisonapi:
 community:
   endpoint.url: http://localhost:8096
 
+probationoffendersearch:
+  endpoint.url: http://localhost:8097
+
 test:
   maxLengthSeconds: 10
   resultPollMs: 1000

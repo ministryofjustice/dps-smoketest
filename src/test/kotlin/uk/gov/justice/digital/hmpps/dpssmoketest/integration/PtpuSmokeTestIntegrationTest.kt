@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Test
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
-class SmokeTestIntegrationTest : IntegrationTestBase() {
+class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   protected lateinit var jwtAuthHelper: JwtAuthHelper
@@ -295,6 +295,7 @@ class SmokeTestIntegrationTest : IntegrationTestBase() {
           )
       )
     )
+
   private fun stubResetTestData(status: Int = HTTP_OK) =
     CommunityApiExtension.communityApi.stubFor(
       WireMock.post(WireMock.anyUrl()).willReturn(
