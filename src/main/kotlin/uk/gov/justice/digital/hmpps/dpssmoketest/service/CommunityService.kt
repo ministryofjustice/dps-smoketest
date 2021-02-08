@@ -51,12 +51,16 @@ class CommunityService(
     return webClient.post()
       .uri("/secure/smoketest/offenders/crn/{crn}/details", crn)
       .contentType(MediaType.APPLICATION_JSON)
-      .body(BodyInserters.fromValue("""
-        {
-          "firstName": "$firstName",
-          "surname": "$surname"
-        }
-      """.trimIndent()))
+      .body(
+        BodyInserters.fromValue(
+          """
+            {
+              "firstName": "$firstName",
+              "surname": "$surname"
+            }
+          """.trimIndent()
+        )
+      )
       .retrieve()
       .toBodilessEntity()
       .map { TestStatus("Offender details set for $crn") }

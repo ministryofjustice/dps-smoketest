@@ -119,7 +119,6 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       .exchange()
       .expectStatus().isOk
       .returnResult(TestStatus::class.java)
-
 }
 
 private fun stubCheckOffenderExists(status: Int = HttpURLConnection.HTTP_OK) =
@@ -131,7 +130,7 @@ private fun stubCheckOffenderExists(status: Int = HttpURLConnection.HTTP_OK) =
         .withBody(
           """
             { "firstName": "Jane", "surname": "Smith" }
-            """.trimIndent()
+          """.trimIndent()
         )
     )
   )
@@ -144,4 +143,3 @@ private fun stubChangeOffenderName(status: Int = HttpURLConnection.HTTP_OK) =
         .withStatus(status)
     )
   )
-

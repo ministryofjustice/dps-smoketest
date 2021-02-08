@@ -301,11 +301,11 @@ class CommunityServiceTest : IntegrationTestBase() {
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .withBody(
               """
-              {
-              "firstName": "Jane",
-              "surname": "Smith"
-              }
-            """.trimIndent()
+                {
+                "firstName": "Jane",
+                "surname": "Smith"
+                }
+              """.trimIndent()
             )
         )
       )

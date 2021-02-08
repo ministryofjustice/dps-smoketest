@@ -27,7 +27,6 @@ private fun generateRandomNames(): Pair<String, String> {
   return randomString() to randomString()
 }
 
-
 private fun randomString(): String {
   val charPool: List<Char> = ('a'..'z') + ('A'..'Z')
 
