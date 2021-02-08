@@ -27,7 +27,7 @@ class PtpuSmokeTestService(
       .flatMap {
         Flux.concat(
           Flux.just(it.testStatus),
-          Flux.from(communityService.resetTestData(it.crn)),
+          Flux.from(communityService.resetCustodyTestData(it.crn)),
           Flux.from(prisonService.triggerTest(it.nomsNumber)),
           communityService.waitForTestToComplete(it.nomsNumber, it.bookingNumber),
           waitForUpdates(),

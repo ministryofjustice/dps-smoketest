@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Flux
@@ -21,7 +22,7 @@ class CommunityService(
   @Qualifier("communityApiWebClient") private val webClient: WebClient
 ) {
 
-  fun resetTestData(crn: String): Mono<TestStatus> {
+  fun resetCustodyTestData(crn: String): Mono<TestStatus> {
 
     fun failOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Reset Community test failed. The offender $crn can not be found", FAIL))
@@ -39,13 +40,41 @@ class CommunityService(
       .onErrorResume(::failOnError)
   }
 
+  fun setOffenderDetailsTestData(crn: String, firstName: String, surname: String): Mono<TestStatus> {
+
+    fun failOnNotFound(): Mono<out TestStatus> =
+      Mono.just(TestStatus("Update offender details test failed. The offender $crn can not be found", FAIL))
+
+    fun failOnError(exception: Throwable): Mono<out TestStatus> =
+      Mono.just(TestStatus("Update offender details test failed for $crn failed due to ${exception.message}", FAIL))
+
+    return webClient.post()
+      .uri("/secure/smoketest/offenders/crn/{crn}/details", crn)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(
+        BodyInserters.fromValue(
+          """
+            {
+              "firstName": "$firstName",
+              "surname": "$surname"
+            }
+          """.trimIndent()
+        )
+      )
+      .retrieve()
+      .toBodilessEntity()
+      .map { TestStatus("Offender details set for $crn") }
+      .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
+      .onErrorResume(::failOnError)
+  }
+
   fun waitForTestToComplete(nomsNumber: String, bookingNumber: String): Flux<TestStatus> =
     Flux.interval(Duration.ofMillis(testResultPollMs))
       .take(Duration.ofSeconds(testMaxLengthSeconds))
-      .flatMap { checkTestComplete(nomsNumber, bookingNumber) }
+      .flatMap { checkCustodyTestComplete(nomsNumber, bookingNumber) }
       .takeUntil(TestStatus::testComplete)
 
-  fun checkTestComplete(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
+  fun checkCustodyTestComplete(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
 
     fun testIncompleteOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Still waiting for offender $nomsNumber with booking $bookNumber to be updated"))
@@ -59,6 +88,23 @@ class CommunityService(
       .toBodilessEntity()
       .map { TestStatus("Test for offender $nomsNumber with booking $bookNumber has completed", COMPLETE) }
       .onErrorResume(WebClientResponseException.NotFound::class.java) { testIncompleteOnNotFound() }
+      .onErrorResume(::failOnError)
+  }
+
+  fun checkOffenderExists(crn: String): Mono<TestStatus> {
+
+    fun failOnError(exception: Throwable): Mono<out TestStatus> =
+      Mono.just(TestStatus("Offender we expected to exist $crn failed due to  ${exception.message}", FAIL))
+
+    fun failOnNotFound(): Mono<out TestStatus> =
+      Mono.just(TestStatus("Offender we expected to exist $crn was not found. Check the offender has not be deleted in Delius", FAIL))
+
+    return webClient.get()
+      .uri("/secure/offenders/crn/{crn}", crn)
+      .retrieve()
+      .bodyToMono(OffenderDetails::class.java)
+      .map { TestStatus("Offender $crn exists and is good to go. Current name is ${it.firstName} ${it.surname}") }
+      .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
       .onErrorResume(::failOnError)
   }
 
@@ -81,6 +127,7 @@ class CommunityService(
   private data class CustodyDetails(val bookingNumber: String, val institution: Institution, val status: Status)
   private data class Institution(val nomsPrisonInstitutionCode: String)
   private data class Status(val code: String)
+  private data class OffenderDetails(val firstName: String, val surname: String)
 
   private fun getCustodyDetails(nomsNumber: String, bookNumber: String): Mono<CustodyDetails> =
     webClient.get()

@@ -9,6 +9,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -42,7 +43,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      service.resetTestData("X12345").block()
+      service.resetCustodyTestData("X12345").block()
 
       CommunityApiExtension.communityApi.verify(
         postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/custody/reset"))
@@ -60,7 +61,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.progress).isEqualTo(INCOMPLETE)
+      assertThat(service.resetCustodyTestData("X12345").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -72,7 +73,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.resetCustodyTestData("X12345").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -84,7 +85,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.resetTestData("X12345").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.resetCustodyTestData("X12345").block()?.progress).isEqualTo(FAIL)
     }
   }
 
@@ -99,7 +100,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      service.checkTestComplete("A7742DY", "38479A").block()
+      service.checkCustodyTestComplete("A7742DY", "38479A").block()
 
       CommunityApiExtension.communityApi.verify(
         getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
@@ -116,7 +117,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestComplete("X12345", "38479A").block()?.progress).isEqualTo(COMPLETE)
+      assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(COMPLETE)
     }
 
     @Test
@@ -128,7 +129,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestComplete("X12345", "38479A").block()?.progress).isEqualTo(INCOMPLETE)
+      assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -140,7 +141,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.checkTestComplete("X12345", "38479A").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(FAIL)
     }
   }
 
@@ -222,6 +223,106 @@ class CommunityServiceTest : IntegrationTestBase() {
       )
 
       assertThat(service.assertTestResult(nomsNumber, bookingNumber, prisonCode).block()?.progress).isEqualTo(FAIL)
+    }
+  }
+
+  @Nested
+  @DisplayName("setOffenderDetailsTestData")
+  inner class SetOffenderDetailsTestData {
+    @Test
+    fun `will call set offender details for offender`() {
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
+
+      service.setOffenderDetailsTestData("X12345", "jane", "smith").block()
+
+      CommunityApiExtension.communityApi.verify(
+        postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/details"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+      )
+    }
+
+    @Test
+    fun `will return a non fail test result`() {
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
+
+      assertThat(service.setOffenderDetailsTestData("X12345", "jane", "smith").block()?.progress).isEqualTo(INCOMPLETE)
+    }
+
+    @Test
+    fun `will return a fail test result when details can not be set`() {
+      CommunityApiExtension.communityApi.stubFor(
+        post(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_INTERNAL_ERROR)
+        )
+      )
+
+      assertThat(service.setOffenderDetailsTestData("X12345", "jane", "smith").block()?.progress).isEqualTo(FAIL)
+    }
+  }
+
+  @Nested
+  @DisplayName("checkOffenderExists")
+  inner class CheckOffenderExists {
+    @Test
+    fun `will call get offender details for offender`() {
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+        )
+      )
+
+      service.checkOffenderExists("X12345").block()
+
+      CommunityApiExtension.communityApi.verify(
+        getRequestedFor(urlEqualTo("/secure/offenders/crn/X12345"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+      )
+    }
+
+    @Test
+    fun `will return a non fail test result`() {
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_OK)
+            .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .withBody(
+              """
+                {
+                "firstName": "Jane",
+                "surname": "Smith"
+                }
+              """.trimIndent()
+            )
+        )
+      )
+
+      assertThat(service.checkOffenderExists("X12345").block()?.progress).isEqualTo(INCOMPLETE)
+    }
+
+    @Test
+    fun `will return a fail test result when details can not be retrieved`() {
+      CommunityApiExtension.communityApi.stubFor(
+        get(anyUrl()).willReturn(
+          aResponse()
+            .withStatus(HTTP_INTERNAL_ERROR)
+        )
+      )
+
+      assertThat(service.checkOffenderExists("X12345").block()?.progress).isEqualTo(FAIL)
     }
   }
 }

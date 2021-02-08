@@ -11,5 +11,5 @@ enum class PtpuTestProfiles(val profile: PtpuTestParameters) {
 data class PsiTestParameters(val crn: String)
 
 enum class PsiTestProfiles(val profile: PsiTestParameters) {
-  PSI_T3(PsiTestParameters("X360040"))
+  PSI_T3(PsiTestParameters("X379864"))
 }
