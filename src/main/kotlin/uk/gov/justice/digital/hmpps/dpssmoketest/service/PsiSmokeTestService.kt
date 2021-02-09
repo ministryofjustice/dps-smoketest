@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.service
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
 import kotlin.random.Random.Default.nextInt
 
 @Service
@@ -18,7 +17,11 @@ class PsiSmokeTestService(
       Flux.from(communityService.checkOffenderExists(testProfile.crn)),
       Flux.just(TestStatus("Will update name to $firstName $surname")),
       Flux.from(communityService.setOffenderDetailsTestData(testProfile.crn, firstName, surname)),
-      Flux.just(TestStatus("All done", COMPLETE))
+      probationSearchService.waitForOffenderToBeFound(testProfile.crn, firstName, surname),
+      Flux.from(
+        probationSearchService.assertTestResult(testProfile.crn, firstName, surname)
+      )
+
     ).takeUntil(TestStatus::hasResult)
   }
 }

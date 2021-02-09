@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -13,11 +14,14 @@ import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
+import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.ProbationOffenderSearchExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
-import java.net.HttpURLConnection
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
+import java.net.HttpURLConnection.HTTP_OK
 
 class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
@@ -111,6 +115,72 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     }
   }
 
+  @Nested
+  @DisplayName("When test never completes")
+  inner class TestNeverCompletes {
+    @BeforeEach
+    internal fun setUp() {
+      stubCheckOffenderExists()
+      stubChangeOffenderName()
+      stubTestNeverCompletes()
+    }
+
+    @Test
+    fun `fails on result not found`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for X379864") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult ->
+          testResult.description.contains("Offender X379864 was never found") &&
+            testResult.progress == FAIL
+        }
+        .verifyComplete()
+    }
+  }
+
+  @Nested
+  @DisplayName("When test succeeds")
+  inner class TestSucceeds {
+    @BeforeEach
+    internal fun setUp() {
+      stubCheckOffenderExists()
+      stubChangeOffenderName()
+      stubTestComplete()
+    }
+
+    @Test
+    fun `correct events are returned`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for X379864") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult ->
+          testResult.description.contains("Offender X379864 found") &&
+            testResult.progress == COMPLETE
+        }
+        .expectNextMatches { testResult ->
+          testResult.description.contains("finished successfully") &&
+            testResult.progress == SUCCESS
+        }
+        .verifyComplete()
+    }
+  }
+
   private fun postStartTest(): FluxExchangeResult<TestStatus> =
     webTestClient.post()
       .uri("/smoke-test/probation-search-indexer/PSI_T3")
@@ -121,7 +191,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       .returnResult(TestStatus::class.java)
 }
 
-private fun stubCheckOffenderExists(status: Int = HttpURLConnection.HTTP_OK) =
+private fun stubCheckOffenderExists(status: Int = HTTP_OK) =
   CommunityApiExtension.communityApi.stubFor(
     WireMock.get(WireMock.anyUrl()).willReturn(
       WireMock.aResponse()
@@ -135,7 +205,7 @@ private fun stubCheckOffenderExists(status: Int = HttpURLConnection.HTTP_OK) =
     )
   )
 
-private fun stubChangeOffenderName(status: Int = HttpURLConnection.HTTP_OK) =
+private fun stubChangeOffenderName(status: Int = HTTP_OK) =
   CommunityApiExtension.communityApi.stubFor(
     WireMock.post(WireMock.anyUrl()).willReturn(
       WireMock.aResponse()
@@ -143,3 +213,59 @@ private fun stubChangeOffenderName(status: Int = HttpURLConnection.HTTP_OK) =
         .withStatus(status)
     )
   )
+
+private fun stubTestNeverCompletes() {
+  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+    WireMock.post(WireMock.anyUrl()).willReturn(
+      WireMock.aResponse()
+        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .withStatus(HTTP_OK)
+        .withBody(
+          """
+            []
+          """.trimIndent()
+        )
+    )
+  )
+}
+
+private fun stubTestComplete() {
+  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+    WireMock.post(WireMock.anyUrl())
+      .inScenario("My Scenario")
+      .whenScenarioStateIs(Scenario.STARTED)
+      .willReturn(
+        WireMock.aResponse()
+          .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+          .withStatus(HTTP_OK)
+          .withBody(
+            """
+            []
+            """.trimIndent()
+          )
+      )
+      .willSetStateTo("Found")
+  )
+  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+    WireMock.post(WireMock.anyUrl())
+      .inScenario("My Scenario")
+      .whenScenarioStateIs("Found")
+      .willReturn(
+        WireMock.aResponse()
+          .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+          .withStatus(HTTP_OK)
+          .withBody(
+            """
+            [
+             {
+                "crn": "SOMECRN",
+                "firstName": "SOMENAME",
+                "surname": "SOMENAME"
+             }
+            ]
+            """.trimIndent()
+          )
+      )
+      .willSetStateTo("Found")
+  )
+}
