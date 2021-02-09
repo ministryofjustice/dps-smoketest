@@ -59,13 +59,18 @@ class ProbationSearchService(
       )
 
     return searchForOffender(crn, firstName, surname).map {
-      if (it.isEmpty()) {
+      if (it.size != 1) {
         SmokeTestResource.TestStatus("Offender $crn was never found with name $firstName $surname", SmokeTestResource.TestStatus.TestProgress.FAIL)
       } else {
-        SmokeTestResource.TestStatus(
-          "Test for offender $crn with name ${it[0].firstName} ${it[0].surname} finished successfully",
-          SmokeTestResource.TestStatus.TestProgress.SUCCESS
-        )
+        val offenderDetails = it[0]
+        if (offenderDetails.firstName == firstName && offenderDetails.surname == surname && offenderDetails.otherIds.crn == crn) {
+          SmokeTestResource.TestStatus(
+            "Test for offender $crn finished successfully",
+            SmokeTestResource.TestStatus.TestProgress.SUCCESS
+          )
+        } else {
+          SmokeTestResource.TestStatus("The offender $crn was not found with name $firstName $surname", SmokeTestResource.TestStatus.TestProgress.FAIL)
+        }
       }
     }.onErrorResume(::failOnError)
   }
@@ -74,20 +79,25 @@ class ProbationSearchService(
     return webClient.post()
       .uri("/search")
       .contentType(MediaType.APPLICATION_JSON)
-      .body(
-        BodyInserters.fromValue(
-          """
-            {
-              "crn": "$crn",
-              "firstName": "$firstName",
-              "surname": "$surname"
-            }
-          """.trimIndent()
-        )
-      )
+      .body(searchByCrnNameBody(crn, firstName, surname))
       .retrieve()
       .bodyToMono(object : ParameterizedTypeReference<List<OffenderDetails>>() {})
   }
+
+  private fun searchByCrnNameBody(
+    crn: String,
+    firstName: String,
+    surname: String
+  ) = BodyInserters.fromValue(
+    """
+              {
+                "crn": "$crn",
+                "firstName": "$firstName",
+                "surname": "$surname"
+              }
+    """.trimIndent()
+  )
 }
 
-private data class OffenderDetails(val firstName: String, val surname: String)
+private data class IDs(val crn: String)
+private data class OffenderDetails(val firstName: String, val surname: String, val otherIds: IDs)

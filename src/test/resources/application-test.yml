@@ -17,7 +17,8 @@ management.endpoint:
 
 test:
   maxLengthSeconds: 10
-  resultPollMs: 1000
+  # poll set so we can get no more than 9 attempts in 10 seconds
+  resultPollMs: 1010
 
 smoketest:
   client:

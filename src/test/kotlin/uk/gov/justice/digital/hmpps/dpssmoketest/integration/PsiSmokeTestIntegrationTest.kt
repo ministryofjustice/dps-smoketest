@@ -31,6 +31,13 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
   @Nested
   @DisplayName("API tests")
   inner class ApiTests {
+    @BeforeEach
+    internal fun setUp() {
+      stubCheckOffenderExists()
+      stubChangeOffenderName()
+      stubTestWillCompleteSuccessfully()
+    }
+
     @Test
     fun `requires valid authentication token`() {
       webTestClient.post()
@@ -151,13 +158,44 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
   }
 
   @Nested
+  @DisplayName("When final search does not match offender")
+  inner class TestNonMatchingOffender {
+    @BeforeEach
+    internal fun setUp() {
+      stubCheckOffenderExists()
+      stubChangeOffenderName()
+      stubTestCompletesWithNonMatch()
+    }
+
+    @Test
+    fun `fails on result not found`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody)
+        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for X379864") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult ->
+          testResult.description.contains("Offender X379864 found with name Meaty Bones") &&
+            testResult.progress == COMPLETE
+        }
+        .expectNextMatches { testResult ->
+          testResult.description.contains("The offender X379864 was not found with name") &&
+            testResult.progress == FAIL
+        }
+        .verifyComplete()
+    }
+  }
+
+  @Nested
   @DisplayName("When test succeeds")
   inner class TestSucceeds {
     @BeforeEach
     internal fun setUp() {
       stubCheckOffenderExists()
       stubChangeOffenderName()
-      stubTestComplete()
+      stubTestWillCompleteSuccessfully()
     }
 
     @Test
@@ -174,7 +212,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
             testResult.progress == COMPLETE
         }
         .expectNextMatches { testResult ->
-          testResult.description.contains("finished successfully") &&
+          testResult.description.contains("Test for offender X379864 finished successfully") &&
             testResult.progress == SUCCESS
         }
         .verifyComplete()
@@ -229,7 +267,38 @@ private fun stubTestNeverCompletes() {
   )
 }
 
-private fun stubTestComplete() {
+private fun stubTestWillCompleteSuccessfully() {
+  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+    WireMock.post(WireMock.anyUrl())
+      .inScenario("My Scenario")
+      .whenScenarioStateIs(Scenario.STARTED)
+      .willReturn(
+        WireMock.aResponse()
+          .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+          .withStatus(HTTP_OK)
+          .withBody(
+            """
+            []
+            """.trimIndent()
+          )
+      )
+      .willSetStateTo("Found")
+  )
+  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+    WireMock.post(WireMock.anyUrl())
+      .inScenario("My Scenario")
+      .whenScenarioStateIs("Found")
+      .willReturn(
+        WireMock.aResponse()
+          .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+          .withStatus(HTTP_OK)
+          .withTransformers("search-body")
+      )
+      .willSetStateTo("Found")
+  )
+}
+
+private fun stubTestCompletesWithNonMatch() {
   ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
       .inScenario("My Scenario")
@@ -258,13 +327,16 @@ private fun stubTestComplete() {
             """
             [
              {
-                "crn": "SOMECRN",
-                "firstName": "SOMENAME",
-                "surname": "SOMENAME"
+                "otherIds": {
+                  "crn": "X12345"
+                },
+                "firstName": "Meaty",
+                "surname": "Bones"
              }
             ]
             """.trimIndent()
           )
+
       )
       .willSetStateTo("Found")
   )
