@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import kotlin.random.Random.Default.nextInt
 
@@ -24,8 +25,10 @@ class PsiSmokeTestService(
 
     ).takeUntil(TestStatus::hasResult)
   }
-}
 
+  fun cleanup(testProfile: PsiTestParameters): Mono<TestStatus> =
+    communityService.setOffenderDetailsTestData(testProfile.crn, "PSI", "Smoketest")
+}
 private fun generateRandomNames(): Pair<String, String> {
   return randomString() to randomString()
 }

@@ -98,7 +98,7 @@ class SmokeTestResource(
       required = true
     ) @NotNull @PathVariable(value = "testProfile") testProfile: String
   ): Flux<TestStatus> = runCatching { PsiTestProfiles.valueOf(testProfile).profile }
-    .map { psiSmokeTestService.runSmokeTest(it) }
+    .map { profile -> psiSmokeTestService.runSmokeTest(profile).doOnComplete { psiSmokeTestService.cleanup(profile).share().block() } }
     .getOrDefault(Flux.just(TestStatus("Unknown test profile $testProfile", FAIL)))
 
   @Schema(description = "One of a sequence test statuses. The last status should have progress SUCCESS or FAIL if the test concluded.")
