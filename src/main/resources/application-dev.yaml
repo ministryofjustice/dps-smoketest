@@ -26,3 +26,6 @@ smoketest:
   client:
     client-id: smoke-test-client
     client-secret: password123456
+
+server:
+  shutdown: immediate
