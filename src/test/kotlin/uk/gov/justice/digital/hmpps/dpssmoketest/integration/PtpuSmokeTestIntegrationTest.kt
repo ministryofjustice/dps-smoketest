@@ -209,12 +209,12 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
       stubTestComplete()
       stubGetCustodyDetails(
         body =
-          """
+        """
           { "bookingNumber": "38479A",
             "institution": { "nomsPrisonInstitutionCode": "WRONG_PRISON" },
             "status": { "code": "D" }
           }
-          """.trimIndent()
+        """.trimIndent()
       )
     }
 
@@ -248,12 +248,12 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
       stubTestComplete()
       stubGetCustodyDetails(
         body =
-          """
+        """
           { "bookingNumber": "38479A",
             "institution": { "nomsPrisonInstitutionCode": "MDI" },
             "status": { "code": "D" }
           }
-          """.trimIndent()
+        """.trimIndent()
       )
     }
 
