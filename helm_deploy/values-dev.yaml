@@ -22,3 +22,7 @@ env:
   PRISONAPI_ENDPOINT_URL: "https://api-dev.prison.service.justice.gov.uk"
   COMMUNITY_ENDPOINT_URL: "https://community-api-secure.test.delius.probation.hmpps.dsd.io"
   PROBATIONOFFENDERSEARCH_ENDPOINT_URL: "https://probation-offender-search-dev.hmpps.service.justice.gov.uk"
+
+# CloudPlatform AlertManager receiver to route promethues alerts to slack
+generic-prometheus-alerts:
+  alertSeverity: hmpps_tech_non_prod
