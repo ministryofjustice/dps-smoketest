@@ -24,7 +24,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
   @Nested
-  @DisplayName("API tests")
+  @DisplayName("Poe API tests")
   inner class ApiTests {
     @Test
     fun `requires valid authentication token`() {
@@ -80,7 +80,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `test status reflects error`() {
+    fun `status reflects error`() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
@@ -99,7 +99,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `test status reflects success`() {
+    fun `status reflects success`() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)

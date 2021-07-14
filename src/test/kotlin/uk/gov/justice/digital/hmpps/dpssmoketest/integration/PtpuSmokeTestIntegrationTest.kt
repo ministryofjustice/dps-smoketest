@@ -28,7 +28,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
   @Nested
-  @DisplayName("API tests")
+  @DisplayName("Ptpu API tests")
   inner class ApiTests {
     @Test
     fun `requires valid authentication token`() {

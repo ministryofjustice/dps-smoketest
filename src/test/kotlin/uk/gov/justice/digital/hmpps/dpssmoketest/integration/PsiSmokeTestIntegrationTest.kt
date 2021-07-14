@@ -33,7 +33,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
   @Nested
-  @DisplayName("API tests")
+  @DisplayName("Psi API tests")
   inner class ApiTests {
     @BeforeEach
     internal fun setUp() {
