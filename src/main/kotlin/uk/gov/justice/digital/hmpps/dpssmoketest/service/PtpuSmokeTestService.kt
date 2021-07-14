@@ -23,12 +23,12 @@ class PtpuSmokeTestService(
 ) {
 
   fun runSmokeTest(testProfile: PtpuTestParameters): Flux<TestStatus> {
-    return Flux.from(prisonService.getTestInputs(testProfile.nomsNumber, testProfile.crn))
+    return Flux.from(prisonService.getPtpuTestInputs(testProfile.nomsNumber, testProfile.crn))
       .flatMap {
         Flux.concat(
           Flux.just(it.testStatus),
           Flux.from(communityService.resetCustodyTestData(it.crn)),
-          Flux.from(prisonService.triggerTest(it.nomsNumber)),
+          Flux.from(prisonService.triggerPtpuTest(it.nomsNumber)),
           communityService.waitForTestToComplete(it.nomsNumber, it.bookingNumber),
           waitForUpdates(),
           Flux.from(
