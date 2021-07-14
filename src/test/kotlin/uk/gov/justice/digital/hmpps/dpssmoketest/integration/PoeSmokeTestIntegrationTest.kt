@@ -26,6 +26,12 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
   @Nested
   @DisplayName("Poe API tests")
   inner class ApiTests {
+
+    @BeforeEach
+    internal fun setUp() {
+      stubTriggerTest()
+    }
+
     @Test
     fun `requires valid authentication token`() {
       webTestClient.post()
