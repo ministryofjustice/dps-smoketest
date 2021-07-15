@@ -14,7 +14,7 @@ class PoeSmokeTestService(
       // Trigger test by releasing prisoner
       Flux.from(prisonService.triggerPoeReleaseTest(testProfile.nomsNumber)),
       // Check for hmpps domain release event
-      prisonService.waitForEventToBeProduced(testProfile.nomsNumber),
+      Flux.from(prisonService.waitForEventToBeProduced(testProfile.nomsNumber)),
 
       // Trigger test by recalling prisoner
       // Flux.from(prisonService.triggerPoeRecallTest(it.nomsNumber)),

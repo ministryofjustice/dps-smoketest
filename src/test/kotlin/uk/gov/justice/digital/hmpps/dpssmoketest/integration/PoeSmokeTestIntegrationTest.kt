@@ -127,7 +127,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
   private fun stubTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
-      WireMock.post(WireMock.anyUrl()).willReturn(
+      WireMock.put(WireMock.anyUrl()).willReturn(
         WireMock.aResponse()
           .withStatus(status)
       )

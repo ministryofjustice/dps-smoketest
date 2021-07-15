@@ -80,7 +80,7 @@ class PrisonService(
     fun failOnError(exception: Throwable): Mono<out TestStatus> =
       Mono.just(TestStatus("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
 
-    return webClient.post()
+    return webClient.put()
       .uri("/api/smoketest/offenders/{nomsNumber}/release", nomsNumber)
       .contentType(MediaType.APPLICATION_JSON)
       .retrieve()
