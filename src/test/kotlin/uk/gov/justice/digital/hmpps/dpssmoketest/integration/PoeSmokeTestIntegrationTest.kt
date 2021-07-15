@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Test
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
-@Disabled
 class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Autowired
