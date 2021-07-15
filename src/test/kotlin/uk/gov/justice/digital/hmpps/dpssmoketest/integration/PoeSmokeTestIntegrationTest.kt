@@ -76,7 +76,8 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .expectStatus().isOk
         .returnResult(String::class.java)
 
-      StepVerifier.create(results.responseBody).thenCancel().verify()
+      StepVerifier.create(results.responseBody).expectNextCount(3)
+        .verifyComplete()
     }
   }
 
