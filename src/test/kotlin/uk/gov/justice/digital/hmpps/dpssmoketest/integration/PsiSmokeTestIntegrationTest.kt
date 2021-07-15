@@ -78,12 +78,15 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `succeeds with correct access and test profile`() {
-      webTestClient.post()
+      val results = webTestClient.post()
         .uri("/smoke-test/probation-search-indexer/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
         .expectStatus().isOk
+        .returnResult(String::class.java)
+
+      StepVerifier.create(results.responseBody).thenCancel().verify()
     }
   }
 
