@@ -28,7 +28,6 @@ import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
-@Disabled
 class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Autowired
