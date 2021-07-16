@@ -21,8 +21,8 @@ spring:
       client:
         registration:
           prison-api:
-            provider: hmpps-auth
-            client-id: ${smoketest.client.client-id}
+            provider: hmpps-auth-with-user
+            client-id: ${smoketest.client.client-id}/username=SMOKE_TEST_USER
             client-secret: ${smoketest.client.client-secret}
             authorization-grant-type: client_credentials
           community-api:
@@ -38,6 +38,8 @@ spring:
         provider:
           hmpps-auth:
             token-uri: ${oauth.endpoint.url}/oauth/token
+          hmpps-auth-with-user:
+            token-uri: ${oauth.endpoint.url}/oauth/token?username=SMOKE_TEST_USER
 
 
 server:
@@ -84,3 +86,7 @@ smoketest:
     access-token-uri: ${oauth.token.url}
     authentication-scheme: header
     client-authentication-scheme: header
+
+aws:
+  provider: aws
+  region: eu-west-2
