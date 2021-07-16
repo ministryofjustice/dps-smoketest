@@ -39,7 +39,7 @@ class OAuthMockServer : WireMockServer(WIREMOCK_PORT) {
 
   fun stubGrantToken() {
     stubFor(
-      WireMock.post(WireMock.urlEqualTo("/auth/oauth/token"))
+      WireMock.post(WireMock.urlPathMatching("/auth/oauth/token"))
         .willReturn(
           aResponse()
             .withHeaders(HttpHeaders(HttpHeader("Content-Type", "application/json")))
