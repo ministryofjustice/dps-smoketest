@@ -28,7 +28,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
   @Nested
-  @DisplayName("API tests")
+  @DisplayName("Ptpu API tests")
   inner class ApiTests {
     @Test
     fun `requires valid authentication token`() {
@@ -66,12 +66,16 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `succeeds with correct access and test profile`() {
-      webTestClient.post()
+      val results = webTestClient.post()
         .uri("/smoke-test/prison-to-probation-update/PTPU_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
         .expectStatus().isOk
+        .returnResult(String::class.java)
+
+      StepVerifier.create(results.responseBody).expectNextCount(1)
+        .verifyComplete()
     }
   }
 

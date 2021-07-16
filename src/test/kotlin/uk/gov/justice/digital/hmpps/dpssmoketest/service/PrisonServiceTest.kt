@@ -40,7 +40,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      service.triggerTest("A7742DY").block()
+      service.triggerPtpuTest("A7742DY").block()
 
       PrisonApiExtension.prisonApi.verify(
         postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
@@ -58,7 +58,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.triggerTest("A7742DY").block()?.progress).isEqualTo(INCOMPLETE)
+      assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -70,7 +70,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.triggerTest("A7742DY").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -82,13 +82,13 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      assertThat(service.triggerTest("A7742DY").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(FAIL)
     }
   }
 
   @Nested
   @DisplayName("Get test inputs")
-  inner class GetTestInputs {
+  inner class getPtpuTestInputs {
     @Test
     internal fun `will call get imprisonment status for the offender`() {
       PrisonApiExtension.prisonApi.stubFor(
@@ -104,7 +104,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      service.getTestInputs("A7742DY", "X360040").block()
+      service.getPtpuTestInputs("A7742DY", "X360040").block()
 
       PrisonApiExtension.prisonApi.verify(
         getRequestedFor(urlEqualTo("/api/bookings/offenderNo/A7742DY"))
@@ -128,7 +128,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      val result = service.getTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
+      val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
 
       assertThat(result.testStatus.progress == INCOMPLETE)
       assertThat(result.nomsNumber).isEqualTo("A7742DY")
@@ -146,7 +146,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      val result = service.getTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
+      val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
 
       assertThat(result.testStatus.progress == FAIL)
       assertThat(result.nomsNumber).isEqualTo("A7742DY")
@@ -164,7 +164,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         )
       )
 
-      val result = service.getTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
+      val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
 
       assertThat(result.testStatus.progress == FAIL)
       assertThat(result.nomsNumber).isEqualTo("A7742DY")

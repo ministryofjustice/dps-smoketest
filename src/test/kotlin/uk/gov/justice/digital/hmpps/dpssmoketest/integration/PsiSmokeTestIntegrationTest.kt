@@ -33,7 +33,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
   protected lateinit var jwtAuthHelper: JwtAuthHelper
 
   @Nested
-  @DisplayName("API tests")
+  @DisplayName("Psi API tests")
   inner class ApiTests {
     @BeforeEach
     internal fun setUp() {
@@ -78,12 +78,16 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
     @Test
     fun `succeeds with correct access and test profile`() {
-      webTestClient.post()
+      val results = webTestClient.post()
         .uri("/smoke-test/probation-search-indexer/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
         .expectStatus().isOk
+        .returnResult(String::class.java)
+
+      StepVerifier.create(results.responseBody).expectNextCount(6)
+        .verifyComplete()
     }
   }
 
