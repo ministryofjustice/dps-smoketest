@@ -22,7 +22,7 @@ spring:
         registration:
           prison-api:
             provider: hmpps-auth-with-user
-            client-id: ${smoketest.client.client-id}/username=SMOKE_TEST_USER
+            client-id: ${smoketest.client.client-id}
             client-secret: ${smoketest.client.client-secret}
             authorization-grant-type: client_credentials
           community-api:
