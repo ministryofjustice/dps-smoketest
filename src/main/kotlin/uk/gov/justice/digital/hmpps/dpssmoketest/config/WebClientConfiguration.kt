@@ -17,7 +17,6 @@ class WebClientConfiguration(
   @Value("\${prisonapi.endpoint.url}") private val prisonapiRootUri: String,
   @Value("\${oauth.endpoint.url}") private val oauthRootUri: String,
   @Value("\${probationoffendersearch.endpoint.url}") private val probationOffenderSearchUri: String,
-  private val webClientBuilder: WebClient.Builder
 ) {
 
   @Bean
@@ -25,7 +24,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
     oauth2Client.setDefaultClientRegistrationId("community-api")
 
-    return webClientBuilder
+    return WebClient.builder()
       .baseUrl(communityRootUri)
       .apply(oauth2Client.oauth2Configuration())
       .build()
@@ -36,7 +35,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
     oauth2Client.setDefaultClientRegistrationId("prison-api")
 
-    return webClientBuilder
+    return WebClient.builder()
       .baseUrl(prisonapiRootUri)
       .apply(oauth2Client.oauth2Configuration())
       .build()
@@ -47,7 +46,7 @@ class WebClientConfiguration(
     val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
     oauth2Client.setDefaultClientRegistrationId("probation-offender-search")
 
-    return webClientBuilder
+    return WebClient.builder()
       .baseUrl(probationOffenderSearchUri)
       .apply(oauth2Client.oauth2Configuration())
       .build()
@@ -55,17 +54,17 @@ class WebClientConfiguration(
 
   @Bean
   fun communityApiHealthWebClient(): WebClient {
-    return webClientBuilder.baseUrl(communityRootUri).build()
+    return WebClient.builder().baseUrl(communityRootUri).build()
   }
 
   @Bean
   fun prisonApiHealthWebClient(): WebClient {
-    return webClientBuilder.baseUrl(prisonapiRootUri).build()
+    return WebClient.builder().baseUrl(prisonapiRootUri).build()
   }
 
   @Bean
   fun oauthApiHealthWebClient(): WebClient {
-    return webClientBuilder.baseUrl(oauthRootUri).build()
+    return WebClient.builder().baseUrl(oauthRootUri).build()
   }
 
   @Bean
