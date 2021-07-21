@@ -13,6 +13,7 @@ import reactor.test.StepVerifier
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
+import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.INCOMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
@@ -67,8 +68,8 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .verifyComplete()
     }
 
-    @Test
     @Disabled
+    @Test
     fun `succeeds with correct access and test profile`() {
       val results = webTestClient.post()
         .uri("/smoke-test/prison-offender-events/POE_T3")
@@ -84,8 +85,8 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
   }
 
   @Nested
-  @DisplayName("When trigger test fails")
-  inner class WhenTriggerFails {
+  @DisplayName("When trigger test fails for release event")
+  inner class WhenTriggerFailsForReleaseEvent {
     @BeforeEach
     internal fun setUp() {
       stubTriggerTest(HTTP_NOT_FOUND)
@@ -97,6 +98,30 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNext(TestStatus("Will release prisoner A7851DY", INCOMPLETE))
+        .expectNext(TestStatus("Trigger test failed. The offender A7851DY can not be found", FAIL))
+        .verifyComplete()
+    }
+  }
+
+  @Nested
+  @DisplayName("When trigger test fails for recall")
+  inner class WhenTriggerFailsForRecallEvent {
+    @BeforeEach
+    internal fun setUp() {
+      stubReleaseTriggerTest(HTTP_OK)
+      stubRecallTriggerTest(HTTP_NOT_FOUND)
+    }
+
+    @Test
+    fun `status reflects error`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody)
+        .expectNext(TestStatus("Will release prisoner A7851DY", INCOMPLETE))
+        .expectNext(TestStatus("Triggered test for A7851DY"))
+        .expectNext(TestStatus("Test for offender A7851DY prison-offender-events.prisoner.released event finished successfully", COMPLETE))
+
+        .expectNext(TestStatus("Will recall prisoner A7851DY", INCOMPLETE))
         .expectNext(TestStatus("Trigger test failed. The offender A7851DY can not be found", FAIL))
         .verifyComplete()
     }
@@ -117,7 +142,12 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       StepVerifier.create(results.responseBody)
         .expectNext(TestStatus("Will release prisoner A7851DY", INCOMPLETE))
         .expectNext(TestStatus("Triggered test for A7851DY"))
-        .expectNext(TestStatus("Test for offender A7851DY released event finished successfully", SUCCESS))
+        .expectNext(TestStatus("Test for offender A7851DY prison-offender-events.prisoner.released event finished successfully", COMPLETE))
+
+        .expectNext(TestStatus("Will recall prisoner A7851DY", INCOMPLETE))
+        .expectNext(TestStatus("Triggered test for A7851DY"))
+        .expectNext(TestStatus("Test for offender A7851DY prison-offender-events.prisoner.received event finished successfully", SUCCESS))
+
         .verifyComplete()
     }
   }
@@ -134,6 +164,21 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
   private fun stubTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
       WireMock.put(WireMock.anyUrl()).willReturn(
+        WireMock.aResponse()
+          .withStatus(status)
+      )
+    )
+
+  private fun stubReleaseTriggerTest(status: Int = HTTP_OK) =
+    PrisonApiExtension.prisonApi.stubFor(
+      WireMock.put("/api/smoketest/offenders/A7851DY/release").willReturn(
+        WireMock.aResponse()
+          .withStatus(status)
+      )
+    )
+  private fun stubRecallTriggerTest(status: Int = HTTP_OK) =
+    PrisonApiExtension.prisonApi.stubFor(
+      WireMock.put("/api/smoketest/offenders/A7851DY/recall").willReturn(
         WireMock.aResponse()
           .withStatus(status)
       )

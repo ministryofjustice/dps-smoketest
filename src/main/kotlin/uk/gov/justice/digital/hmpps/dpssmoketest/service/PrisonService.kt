@@ -1,27 +1,20 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
-import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
-import java.time.Duration
 
 @Service
 class PrisonService(
-  @Value("\${test.maxLengthSeconds}") private val testMaxLengthSeconds: Long,
-  @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
   @Qualifier("prisonApiWebClient") private val webClient: WebClient
 ) {
-
   fun triggerPtpuTest(nomsNumber: String): Mono<TestStatus> {
 
     fun failOnNotFound(): Mono<out TestStatus> =
@@ -82,7 +75,6 @@ class PrisonService(
 
     return webClient.put()
       .uri("/api/smoketest/offenders/{nomsNumber}/release", nomsNumber)
-      .contentType(MediaType.APPLICATION_JSON)
       .retrieve()
       .toBodilessEntity()
       .map { TestStatus("Triggered test for $nomsNumber") }
@@ -90,13 +82,20 @@ class PrisonService(
       .onErrorResume(::failOnError)
   }
 
-  fun waitForEventToBeProduced(nomsNumber: String): Flux<TestStatus> =
-    Flux.interval(Duration.ofMillis(testResultPollMs))
-      .take(Duration.ofSeconds(testMaxLengthSeconds))
-      .flatMap { checkEventProduced(nomsNumber) }
-      .takeUntil(TestStatus::testComplete)
+  fun triggerPoeRecallTest(nomsNumber: String): Mono<TestStatus> {
 
-  // TODO(add call to check event created - may not be in prison api)
-  fun checkEventProduced(nomsNumber: String): Mono<TestStatus> =
-    Mono.just(TestStatus("Test for offender $nomsNumber released event finished successfully", SUCCESS))
+    fun failOnNotFound(): Mono<out TestStatus> =
+      Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
+
+    fun failOnError(exception: Throwable): Mono<out TestStatus> =
+      Mono.just(TestStatus("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
+
+    return webClient.put()
+      .uri("/api/smoketest/offenders/{nomsNumber}/recall", nomsNumber)
+      .retrieve()
+      .toBodilessEntity()
+      .map { TestStatus("Triggered test for $nomsNumber") }
+      .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
+      .onErrorResume(::failOnError)
+  }
 }
