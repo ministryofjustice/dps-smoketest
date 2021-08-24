@@ -15,8 +15,7 @@ class PoeSmokeTestService(
 ) {
   fun runSmokeTest(testProfile: PoeTestParameters): Flux<TestStatus> {
 
-    // Remove purge call to test circle build
-    // queueService.purgeQueue()
+    queueService.purgeQueue()
 
     return Flux.concat(
       Flux.just(TestStatus("Will release prisoner ${testProfile.nomsNumber}", INCOMPLETE)),
