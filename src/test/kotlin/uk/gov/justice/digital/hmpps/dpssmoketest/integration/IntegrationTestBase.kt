@@ -10,10 +10,12 @@ import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.OAuthExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.ProbationOffenderSearchExtension
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.QueueService
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 
@@ -26,6 +28,12 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
   ProbationOffenderSearchExtension::class
 )
 abstract class IntegrationTestBase {
+
+  @Autowired
+  protected lateinit var jwtAuthHelper: JwtAuthHelper
+
+  @SpyBean
+  protected lateinit var queueService: QueueService
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
