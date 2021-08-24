@@ -7,7 +7,6 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -68,7 +67,6 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .verifyComplete()
     }
 
-    @Disabled
     @Test
     fun `succeeds with correct access and test profile`() {
       val results = webTestClient.post()
