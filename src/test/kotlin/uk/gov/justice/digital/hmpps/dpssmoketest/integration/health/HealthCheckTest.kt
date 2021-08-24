@@ -21,6 +21,20 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Queue health reports queue details but no dlq`() {
+    webTestClient.get().uri("/health")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .jsonPath("components.hmppseventqueue-health.details.queueName").isEqualTo(hmppsEventQueueName)
+      .jsonPath("components.hmppseventqueue-health.details.messagesOnQueue").isEqualTo(0)
+      .jsonPath("components.hmppseventqueue-health.details.messagesInFlight").isEqualTo(0)
+      .jsonPath("components.hmppseventqueue-health.details.messagesOnDlq").doesNotExist()
+      .jsonPath("components.hmppseventqueue-health.details.dlqStatus").doesNotExist()
+      .jsonPath("components.hmppseventqueue-health.details.dlqName").doesNotExist()
+  }
+
+  @Test
   fun `Health info reports version`() {
     webTestClient.get().uri("/health")
       .exchange()

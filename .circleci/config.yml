@@ -6,16 +6,18 @@ orbs:
 jobs:
   validate:
     executor:
-      name: hmpps/java
-      tag: "16.0"
+      name: hmpps/localstack
+      jdk_tag: "16.0"
+      localstack_tag: "0.12.10"
     steps:
       - checkout
+      - hmpps/wait_till_ready
       - restore_cache:
           keys:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew -i -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" check
       - save_cache:
           paths:
             - ~/.gradle

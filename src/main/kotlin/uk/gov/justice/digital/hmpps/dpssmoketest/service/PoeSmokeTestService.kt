@@ -15,7 +15,6 @@ class PoeSmokeTestService(
 ) {
   fun runSmokeTest(testProfile: PoeTestParameters): Flux<TestStatus> {
 
-    // TODO (Should we ensure prisoner is in prison before attempting to release them?)
     queueService.purgeQueue()
 
     return Flux.concat(
@@ -31,7 +30,5 @@ class PoeSmokeTestService(
       Flux.from(prisonService.triggerPoeRecallTest(testProfile.nomsNumber)),
       Flux.from(queueService.waitForEventToBeProduced("prison-offender-events.prisoner.received", testProfile.nomsNumber, SUCCESS)),
     ).takeUntil(TestStatus::hasResult)
-
-    // TODO Question->shall we delete the queue?
   }
 }

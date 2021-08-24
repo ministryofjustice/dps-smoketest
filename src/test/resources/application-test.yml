@@ -33,3 +33,12 @@ community:
 
 probationoffendersearch:
   endpoint.url: http://localhost:8097
+
+aws:
+  provider: localstack
+
+hmpps.sqs:
+  provider: ${aws.provider}
+  queues:
+    hmppseventqueue:
+      queueName: ${random.uuid}

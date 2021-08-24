@@ -49,5 +49,22 @@ env:
   - name: APPLICATIONINSIGHTS_CONFIGURATION_FILE
     value: "{{ .Values.env.APPLICATIONINSIGHTS_CONFIGURATION_FILE }}"
 
+  - name: HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: dps-smoketest-queue-secret
+        key: access_key_id
+
+  - name: HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: dps-smoketest-queue-secret
+        key: secret_access_key
+
+  - name: HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_NAME
+    valueFrom:
+      secretKeyRef:
+        name: dps-smoketest-queue-secret
+        key: sqs_queue_name
 
 {{- end -}}
