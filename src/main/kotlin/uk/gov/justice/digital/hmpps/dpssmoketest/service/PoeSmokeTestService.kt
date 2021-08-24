@@ -30,7 +30,5 @@ class PoeSmokeTestService(
       Flux.from(prisonService.triggerPoeRecallTest(testProfile.nomsNumber)),
       Flux.from(queueService.waitForEventToBeProduced("prison-offender-events.prisoner.received", testProfile.nomsNumber, SUCCESS)),
     ).takeUntil(TestStatus::hasResult)
-
-    // TODO Question->shall we delete the queue?
   }
 }

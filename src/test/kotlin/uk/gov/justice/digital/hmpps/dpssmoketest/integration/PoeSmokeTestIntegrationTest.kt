@@ -115,7 +115,6 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 1 }
     }
 
-    @Disabled
     @Test
     fun `status reflects error`() {
       val results = postStartTest()
@@ -132,7 +131,6 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
   }
 
   @Nested
-  @Disabled
   @DisplayName("When test succeeds")
   inner class TestSucceeds {
     @BeforeEach
@@ -194,6 +192,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       )
     )
 }
+
 private fun String.loadJson(): String {
   return PoeSmokeTestIntegrationTest::class.java.getResource("$this.json").readText()
 }
