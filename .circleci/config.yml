@@ -8,6 +8,7 @@ jobs:
     executor:
       name: hmpps/java
       tag: "16.0"
+      localstack_tag: "0.12.10"
     steps:
       - checkout
       - hmpps/install_aws_cli
