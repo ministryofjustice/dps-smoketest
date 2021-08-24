@@ -16,7 +16,7 @@ services:
     image: quay.io/hmpps/prison-api:latest
     container_name: prison-api
     depends_on:
-      - oauth
+      - hmpps-auth
     ports:
       - "8093:8080"
     healthcheck:
@@ -61,7 +61,7 @@ services:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=localstack,dev
   localstack:
-    image: localstack/localstack:0.11.2
+    image: localstack/localstack:0.12.10
     networks:
       - hmpps
     container_name: localstack
@@ -69,7 +69,7 @@ services:
       - "4566-4597:4566-4597"
       - 8999:8080
     environment:
-      - SERVICES=es
+      - SERVICES=es,sqs
       - ES_PORT_EXTERNAL=4571
       - DEBUG=${DEBUG- }
       - DATA_DIR=/tmp/localstack/data

@@ -1,12 +1,18 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.nhaarman.mockitokotlin2.doNothing
+import com.nhaarman.mockitokotlin2.whenever
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.matches
+import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
@@ -17,6 +23,7 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Test
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.INCOMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
+import uk.gov.justice.digital.hmpps.dpssmoketest.service.QueueService
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
@@ -24,6 +31,9 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
   @Autowired
   protected lateinit var jwtAuthHelper: JwtAuthHelper
+
+  @SpyBean
+  protected lateinit var queueService: QueueService
 
   @Nested
   @DisplayName("Poe API tests")
@@ -79,7 +89,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .expectStatus().isOk
         .returnResult(String::class.java)
 
-      StepVerifier.create(results.responseBody).expectNextCount(3)
+      StepVerifier.create(results.responseBody).expectNextCount(6)
         .verifyComplete()
     }
   }
@@ -110,6 +120,9 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     internal fun setUp() {
       stubReleaseTriggerTest(HTTP_OK)
       stubRecallTriggerTest(HTTP_NOT_FOUND)
+      doNothing().whenever(queueService).purgeQueue()
+      hmppsEventQueue.sqsClient.sendMessage(hmppsEventQueueUrl, "/messages/prisonerReleased".loadJson())
+      await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 1 }
     }
 
     @Test
@@ -133,6 +146,11 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     @BeforeEach
     internal fun setUp() {
       stubTriggerTest()
+      doNothing().whenever(queueService).purgeQueue()
+      hmppsEventQueue.sqsClient.sendMessage(hmppsEventQueueUrl, "/messages/prisonerReleased".loadJson())
+      await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 1 }
+      hmppsEventQueue.sqsClient.sendMessage(hmppsEventQueueUrl, "/messages/prisonerRecalled".loadJson())
+      await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 2 }
     }
 
     @Test
@@ -183,4 +201,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
           .withStatus(status)
       )
     )
+}
+private fun String.loadJson(): String {
+  return PoeSmokeTestIntegrationTest::class.java.getResource("$this.json").readText()
 }

@@ -15,7 +15,6 @@ class PoeSmokeTestService(
 ) {
   fun runSmokeTest(testProfile: PoeTestParameters): Flux<TestStatus> {
 
-    // TODO (Should we ensure prisoner is in prison before attempting to release them?)
     queueService.purgeQueue()
 
     return Flux.concat(

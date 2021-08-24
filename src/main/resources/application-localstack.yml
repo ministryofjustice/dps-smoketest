@@ -1,0 +1,8 @@
+aws:
+  provider: localstack
+
+hmpps.sqs:
+  provider: localstack
+  queues:
+    hmppseventqueue:
+      queueName: hmpps-queue
