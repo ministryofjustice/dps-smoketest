@@ -26,8 +26,12 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
 }
 
+java {
+  toolchain.languageVersion.set(JavaLanguageVersion.of(16))
+}
+
 tasks {
-  compileKotlin {
+  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
       jvmTarget = "16"
     }
