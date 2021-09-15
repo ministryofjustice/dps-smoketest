@@ -123,7 +123,6 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Will release prisoner A7851DY", INCOMPLETE))
         .expectNext(TestStatus("Triggered test for A7851DY"))
         .expectNext(TestStatus("Test for offender A7851DY prison-offender-events.prisoner.released event finished successfully", COMPLETE))
-
         .expectNext(TestStatus("Will recall prisoner A7851DY", INCOMPLETE))
         .expectNext(TestStatus("Trigger test failed. The offender A7851DY can not be found", FAIL))
         .verifyComplete()
@@ -151,11 +150,9 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Will release prisoner A7851DY", INCOMPLETE))
         .expectNext(TestStatus("Triggered test for A7851DY"))
         .expectNext(TestStatus("Test for offender A7851DY prison-offender-events.prisoner.released event finished successfully", COMPLETE))
-
         .expectNext(TestStatus("Will recall prisoner A7851DY", INCOMPLETE))
         .expectNext(TestStatus("Triggered test for A7851DY"))
         .expectNext(TestStatus("Test for offender A7851DY prison-offender-events.prisoner.received event finished successfully", SUCCESS))
-
         .verifyComplete()
     }
   }
