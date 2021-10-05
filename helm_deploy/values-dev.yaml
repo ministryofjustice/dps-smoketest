@@ -1,29 +1,18 @@
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+---
+# Environment specific values, override helm_deploy/dps-smoketest/values.yaml
 
-replicaCount: 2
+generic-service:
+  replicaCount: 2
+  ingress:
+    host: dps-smoketest-dev.hmpps.service.justice.gov.uk
 
-image:
-  repository: quay.io/hmpps/dps-smoketest
-  tag: latest
-  port: 8080
+  env:
+    OAUTH_ENDPOINT_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
+    PRISONAPI_ENDPOINT_URL: "https://api-dev.prison.service.justice.gov.uk"
+    COMMUNITY_ENDPOINT_URL: "https://community-api-secure.test.delius.probation.hmpps.dsd.io"
+    PROBATIONOFFENDERSEARCH_ENDPOINT_URL: "https://probation-offender-search-dev.hmpps.service.justice.gov.uk"
+    APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
-ingress:
-  enabled: true
-  enable_whitelist: false
-  hosts:
-    - host: dps-smoketest-dev.hmpps.service.justice.gov.uk
-      cert_secret: dps-smoketest-cert
-  path: /
-
-env:
-  JAVA_OPTS: "-Xmx512m"
-  OAUTH_ENDPOINT_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
-  PRISONAPI_ENDPOINT_URL: "https://api-dev.prison.service.justice.gov.uk"
-  COMMUNITY_ENDPOINT_URL: "https://community-api-secure.test.delius.probation.hmpps.dsd.io"
-  PROBATIONOFFENDERSEARCH_ENDPOINT_URL: "https://probation-offender-search-dev.hmpps.service.justice.gov.uk"
-  APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
-
-# CloudPlatform AlertManager receiver to route promethues alerts to slack
+# CloudPlatform AlertManager receiver to route prometheus alerts to slack
 generic-prometheus-alerts:
   alertSeverity: hmpps_tech_non_prod
