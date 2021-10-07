@@ -13,6 +13,8 @@ generic-service:
     PROBATIONOFFENDERSEARCH_ENDPOINT_URL: "https://probation-offender-search-dev.hmpps.service.justice.gov.uk"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
+  allowlist: null
+
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 generic-prometheus-alerts:
   alertSeverity: hmpps_tech_non_prod
