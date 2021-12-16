@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.nhaarman.mockitokotlin2.doNothing
-import com.nhaarman.mockitokotlin2.whenever
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
@@ -11,6 +9,8 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.whenever
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
