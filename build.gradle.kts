@@ -24,6 +24,7 @@ dependencies {
   testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.0.27")
   testImplementation("io.projectreactor:reactor-test:3.4.9")
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 }
 
 java {
