@@ -1,13 +1,13 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.14
+  hmpps: ministryofjustice/hmpps@5.1
 
 jobs:
   validate:
     executor:
       name: hmpps/localstack
-      jdk_tag: "17.0"
+      jdk_tag: "18.0"
       localstack_tag: "0.12.10"
     steps:
       - checkout
@@ -98,11 +98,12 @@ workflows:
           slack_channel: hmpps_tech_alerts_security
           context:
             - hmpps-common-vars
-      - hmpps/veracode_pipeline_scan:
-          slack_channel: hmpps_tech_alerts_security
-          context:
-            - hmpps-common-vars
-            - veracode-credentials
+      # currently disabled as no support for jdk 18 or kotlin 1.7
+      # - hmpps/veracode_pipeline_scan:
+      #   slack_channel: hmpps_tech_alerts_security
+      #   context:
+      #     - veracode-credentials
+      #     - hmpps-common-vars
   security-weekly:
     triggers:
       - schedule:
