@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.2"
-  kotlin("plugin.spring") version "1.7.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.4.1"
+  kotlin("plugin.spring") version "1.7.10"
 }
 
 configurations {
@@ -13,7 +13,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.5")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:1.1.8")
 
   implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
   implementation("org.springdoc:springdoc-openapi-data-rest:1.6.9")
@@ -22,7 +22,7 @@ dependencies {
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.1.1")
-  testImplementation("io.projectreactor:reactor-test:3.4.19")
+  testImplementation("io.projectreactor:reactor-test:3.4.22")
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
 }
 
