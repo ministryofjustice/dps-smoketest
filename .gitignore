@@ -68,4 +68,3 @@ ecr.repo
 .editorconfig
 helm_deploy/*/Chart.lock
 helm_deploy/*/charts/
-.trivyignore
