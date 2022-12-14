@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.7.2-beta-1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.7.4"
   kotlin("plugin.spring") version "1.7.22"
 }
 
@@ -22,7 +22,7 @@ dependencies {
 
   testImplementation("io.jsonwebtoken:jjwt:0.9.1")
   testImplementation("io.swagger.parser.v3:swagger-parser-v2-converter:2.1.9")
-  testImplementation("io.projectreactor:reactor-test:3.5.0")
+  testImplementation("io.projectreactor:reactor-test:3.5.1")
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
 }
 
