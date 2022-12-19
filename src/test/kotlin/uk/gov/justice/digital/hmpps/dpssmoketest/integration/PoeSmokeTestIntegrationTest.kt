@@ -14,6 +14,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
@@ -111,8 +112,10 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       stubReleaseTriggerTest(HTTP_OK)
       stubRecallTriggerTest(HTTP_NOT_FOUND)
       doNothing().whenever(queueService).purgeQueue()
-      hmppsEventQueue.sqsClient.sendMessage(hmppsEventQueueUrl, "/messages/prisonerReleased".loadJson())
-      await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 1 }
+      hmppsEventQueue.sqsClient.sendMessage(
+        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build()
+      ).get()
+      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 1 }
     }
 
     @Test
@@ -136,10 +139,14 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     internal fun setUp() {
       stubTriggerTest()
       doNothing().whenever(queueService).purgeQueue()
-      hmppsEventQueue.sqsClient.sendMessage(hmppsEventQueueUrl, "/messages/prisonerReleased".loadJson())
-      await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 1 }
-      hmppsEventQueue.sqsClient.sendMessage(hmppsEventQueueUrl, "/messages/prisonerRecalled".loadJson())
-      await untilCallTo { hmppsEventQueueSqsClient.numMessages(hmppsEventQueueUrl) } matches { it == 2 }
+      hmppsEventQueue.sqsClient.sendMessage(
+        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build()
+      ).get()
+      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 1 }
+      hmppsEventQueue.sqsClient.sendMessage(
+        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerRecalled".loadJson()).build()
+      ).get()
+      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 2 }
     }
 
     @Test
