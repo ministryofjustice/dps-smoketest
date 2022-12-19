@@ -1,28 +1,30 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.config
 
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.servlet.invoke
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
-class ResourceServerConfig : WebSecurityConfigurerAdapter() {
-  override fun configure(http: HttpSecurity) {
+@EnableMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
+class ResourceServerConfig {
+  @Bean
+  fun filterChain(http: HttpSecurity): SecurityFilterChain {
     http {
       sessionManagement { SessionCreationPolicy.STATELESS }
       csrf { disable() }
-      authorizeRequests {
+      authorizeHttpRequests {
         listOf("/webjars/**", "/favicon.ico", "/health/**", "/info", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
-          .forEach { authorize(AntPathRequestMatcher(it), permitAll) }
-        authorize(anyRequest)
+          .forEach { authorize(it, permitAll) }
+        authorize(anyRequest, authenticated)
       }
       oauth2ResourceServer { jwt { jwtAuthenticationConverter = AuthAwareTokenConverter() } }
     }
+    return http.build()
   }
 }

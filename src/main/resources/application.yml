@@ -14,6 +14,8 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false
 
   security:
+    filter:
+      dispatcher-types: request,error,forward,include
     oauth2:
       resourceserver:
         jwt:

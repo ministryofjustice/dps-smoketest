@@ -1,9 +1,5 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
-import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.DeleteMessageRequest
-import com.amazonaws.services.sqs.model.PurgeQueueRequest
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.awaitility.kotlin.await
 import org.slf4j.Logger
@@ -12,6 +8,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
@@ -62,18 +64,19 @@ class QueueService(
 
   fun checkForEvent(eventTypeRequired: String, nomsNumber: String): Boolean {
     var eventFound = false
-    while (hmppsEventQueueSqsClient.countMessagesOnQueue()> 0 && !eventFound) {
+    while (hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl)> 0 && !eventFound) {
       hmppsEventQueueSqsClient.receiveMessage(
-        ReceiveMessageRequest(hmppsEventQueueUrl)
-          .withMaxNumberOfMessages(1)
-      ).messages.firstOrNull()
+        ReceiveMessageRequest.builder().queueUrl(hmppsEventQueueUrl).maxNumberOfMessages(1).build()
+      ).get().messages().firstOrNull()
         ?.also { msg ->
-          val (message, messageId, messageAttributes) = objectMapper.readValue(msg.body, HMPPSMessage::class.java)
+          val (message, messageId, messageAttributes) = objectMapper.readValue(msg.body(), HMPPSMessage::class.java)
           val eventType = messageAttributes.eventType.Value
           val hmppsDomainEvent = objectMapper.readValue(message, HMPPSDomainEvent::class.java)
 
           log.info("Received message $message $messageId type $eventType")
-          hmppsEventQueueSqsClient.deleteMessage(DeleteMessageRequest(hmppsEventQueueUrl, msg.receiptHandle))
+          hmppsEventQueueSqsClient.deleteMessage(
+            DeleteMessageRequest.builder().queueUrl(hmppsEventQueueUrl).receiptHandle(msg.receiptHandle()).build()
+          ).get()
           if (eventTypeRequired == eventType && hmppsDomainEvent.additionalInformation.nomsNumber == nomsNumber) eventFound = true
         }
     }
@@ -81,13 +84,13 @@ class QueueService(
   }
 
   fun purgeQueue() {
-    hmppsEventQueueSqsClient.purgeQueue(PurgeQueueRequest(hmppsEventQueueUrl))
-    await.until { hmppsEventQueueSqsClient.countMessagesOnQueue() == 0 }
+    hmppsEventQueueSqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(hmppsEventQueueUrl).build()).get()
+    await.until { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) == 0 }
   }
 
-  internal fun AmazonSQS.countMessagesOnQueue(): Int =
-    this.getQueueAttributes(hmppsEventQueueUrl, listOf("ApproximateNumberOfMessages"))
-      .let { it.attributes["ApproximateNumberOfMessages"]?.toInt() ?: 0 }
+  internal fun SqsAsyncClient.countMessagesOnQueue(queueUrl: String): Int =
+    this.getQueueAttributes(GetQueueAttributesRequest.builder().queueUrl(queueUrl).attributeNames(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES).build())
+      .let { it.get().attributes()[QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES]?.toInt() ?: 0 }
 }
 
 data class AdditionalInformation(val nomsNumber: String, val details: String, val reason: String, val prisonId: String)

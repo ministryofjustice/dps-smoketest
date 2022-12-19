@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
-import com.amazonaws.services.sqs.AmazonSQS
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -10,6 +9,9 @@ import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import software.amazon.awssdk.services.sqs.SqsAsyncClient
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.OAuthExtension
@@ -53,7 +55,6 @@ abstract class IntegrationTestBase {
   internal val hmppsEventQueueSqsClient by lazy { hmppsEventQueue.sqsClient }
 }
 
-fun AmazonSQS.numMessages(url: String): Int {
-  val queueAttributes = getQueueAttributes(url, listOf("ApproximateNumberOfMessages"))
-  return queueAttributes.attributes["ApproximateNumberOfMessages"]!!.toInt()
-}
+internal fun SqsAsyncClient.countMessagesOnQueue(queueUrl: String): Int =
+  this.getQueueAttributes(GetQueueAttributesRequest.builder().queueUrl(queueUrl).attributeNames(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES).build())
+    .let { it.get().attributes()[QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES]?.toInt() ?: 0 }
