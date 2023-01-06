@@ -1,13 +1,12 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.config
 
-import com.microsoft.applicationinsights.web.internal.ThreadContext
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import io.opentelemetry.api.trace.Span
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.web.servlet.HandlerInterceptor
@@ -16,7 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.text.ParseException
 
 @Configuration
-@ConditionalOnExpression("T(org.apache.commons.lang3.StringUtils).isNotBlank('\${applicationinsights.connection.string:}')")
 class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientTrackingInterceptor) : WebMvcConfigurer {
   override fun addInterceptors(registry: InterceptorRegistry) {
     log.info("Adding application insights client tracking interceptor")
@@ -31,10 +29,12 @@ class ClientTrackingConfiguration(private val clientTrackingInterceptor: ClientT
 @Configuration
 class ClientTrackingInterceptor : HandlerInterceptor {
   override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-    val properties = ThreadContext.getRequestTelemetryContext().httpRequestTelemetry.properties
     val (user, clientId) = findUserAndClient(request)
-    user?.let { properties["username"] = user }
-    clientId?.let { properties["clientId"] = clientId }
+    user?.let {
+      Span.current().setAttribute("username", it) // username in customDimensions
+      Span.current().setAttribute("enduser.id", it) // user_Id at the top level of the request
+    }
+    clientId?.let { Span.current().setAttribute("clientId", clientId) }
     return true
   }
 
