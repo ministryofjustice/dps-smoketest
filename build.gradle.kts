@@ -26,7 +26,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
   testImplementation("io.projectreactor:reactor-test:3.5.3")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
-  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.23.1")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
 }
 
