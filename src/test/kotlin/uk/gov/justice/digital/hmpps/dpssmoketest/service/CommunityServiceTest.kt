@@ -39,8 +39,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       service.resetCustodyTestData("X12345").block()
@@ -48,7 +48,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.verify(
         postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/custody/reset"))
           .withHeader("Content-Type", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
 
@@ -57,8 +57,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       assertThat(service.resetCustodyTestData("X12345").block()?.progress).isEqualTo(INCOMPLETE)
@@ -69,8 +69,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_NOT_FOUND)
-        )
+            .withStatus(HTTP_NOT_FOUND),
+        ),
       )
 
       assertThat(service.resetCustodyTestData("X12345").block()?.progress).isEqualTo(FAIL)
@@ -81,8 +81,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       assertThat(service.resetCustodyTestData("X12345").block()?.progress).isEqualTo(FAIL)
@@ -96,15 +96,15 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       service.checkCustodyTestComplete("A7742DY", "38479A").block()
 
       CommunityApiExtension.communityApi.verify(
         getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
 
@@ -113,8 +113,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(COMPLETE)
@@ -125,8 +125,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_NOT_FOUND)
-        )
+            .withStatus(HTTP_NOT_FOUND),
+        ),
       )
 
       assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(INCOMPLETE)
@@ -137,8 +137,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(FAIL)
@@ -154,8 +154,8 @@ class CommunityServiceTest : IntegrationTestBase() {
         get(anyUrl()).willReturn(
           aResponse()
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .withStatus(HTTP_NOT_FOUND)
-        )
+            .withStatus(HTTP_NOT_FOUND),
+        ),
       )
 
       assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(FAIL)
@@ -167,8 +167,8 @@ class CommunityServiceTest : IntegrationTestBase() {
         get(anyUrl()).willReturn(
           aResponse()
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(FAIL)
@@ -187,9 +187,9 @@ class CommunityServiceTest : IntegrationTestBase() {
                 "institution": { "nomsPrisonInstitutionCode": "MDI" },
                 "status": { "code": "D" }
               }
-              """.trimIndent()
-            )
-        )
+              """.trimIndent(),
+            ),
+        ),
       )
 
       assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(SUCCESS)
@@ -204,7 +204,7 @@ class CommunityServiceTest : IntegrationTestBase() {
     fun `will fail with bad data`(
       nomsNumber: String,
       bookingNumber: String,
-      prisonCode: String
+      prisonCode: String,
     ) {
       CommunityApiExtension.communityApi.stubFor(
         get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/38479A")).willReturn(
@@ -217,9 +217,9 @@ class CommunityServiceTest : IntegrationTestBase() {
                 "institution": { "nomsPrisonInstitutionCode": "MDI" },
                 "status": { "code": "D" }
               }
-              """.trimIndent()
-            )
-        )
+              """.trimIndent(),
+            ),
+        ),
       )
 
       assertThat(service.assertTestResult(nomsNumber, bookingNumber, prisonCode).block()?.progress).isEqualTo(FAIL)
@@ -234,8 +234,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       service.setOffenderDetailsTestData("X12345", "jane", "smith").block()
@@ -243,7 +243,7 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.verify(
         postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X12345/details"))
           .withHeader("Content-Type", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
 
@@ -252,8 +252,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       assertThat(service.setOffenderDetailsTestData("X12345", "jane", "smith").block()?.progress).isEqualTo(INCOMPLETE)
@@ -264,8 +264,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       assertThat(service.setOffenderDetailsTestData("X12345", "jane", "smith").block()?.progress).isEqualTo(FAIL)
@@ -280,15 +280,15 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       service.checkOffenderExists("X12345").block()
 
       CommunityApiExtension.communityApi.verify(
         getRequestedFor(urlEqualTo("/secure/offenders/crn/X12345"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
 
@@ -305,9 +305,9 @@ class CommunityServiceTest : IntegrationTestBase() {
                 "firstName": "Jane",
                 "surname": "Smith"
                 }
-              """.trimIndent()
-            )
-        )
+              """.trimIndent(),
+            ),
+        ),
       )
 
       assertThat(service.checkOffenderExists("X12345").block()?.progress).isEqualTo(INCOMPLETE)
@@ -318,8 +318,8 @@ class CommunityServiceTest : IntegrationTestBase() {
       CommunityApiExtension.communityApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       assertThat(service.checkOffenderExists("X12345").block()?.progress).isEqualTo(FAIL)

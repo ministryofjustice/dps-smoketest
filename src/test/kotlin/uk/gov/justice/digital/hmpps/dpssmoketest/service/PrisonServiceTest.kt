@@ -36,8 +36,8 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       service.triggerPtpuTest("A7742DY").block()
@@ -45,7 +45,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.verify(
         postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
           .withHeader("Content-Type", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
 
@@ -54,8 +54,8 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_OK)
-        )
+            .withStatus(HTTP_OK),
+        ),
       )
 
       assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(INCOMPLETE)
@@ -66,8 +66,8 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_NOT_FOUND)
-        )
+            .withStatus(HTTP_NOT_FOUND),
+        ),
       )
 
       assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(FAIL)
@@ -78,8 +78,8 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(
         post(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(FAIL)
@@ -99,9 +99,9 @@ class PrisonServiceTest : IntegrationTestBase() {
             .withBody(
               """
               {"bookingNo": "38479A", "agencyId": "MDI" }
-              """.trimIndent()
-            )
-        )
+              """.trimIndent(),
+            ),
+        ),
       )
 
       service.getPtpuTestInputs("A7742DY", "X360040").block()
@@ -109,7 +109,7 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.verify(
         getRequestedFor(urlEqualTo("/api/bookings/offenderNo/A7742DY"))
           .withHeader("Content-Type", equalTo("application/json"))
-          .withHeader("Authorization", equalTo("Bearer ABCDE"))
+          .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
 
@@ -123,9 +123,9 @@ class PrisonServiceTest : IntegrationTestBase() {
             .withBody(
               """
               {"bookingNo": "38479A", "agencyId": "MDI" }
-              """.trimIndent()
-            )
-        )
+              """.trimIndent(),
+            ),
+        ),
       )
 
       val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
@@ -142,8 +142,8 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_NOT_FOUND)
-        )
+            .withStatus(HTTP_NOT_FOUND),
+        ),
       )
 
       val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
@@ -160,8 +160,8 @@ class PrisonServiceTest : IntegrationTestBase() {
       PrisonApiExtension.prisonApi.stubFor(
         get(anyUrl()).willReturn(
           aResponse()
-            .withStatus(HTTP_INTERNAL_ERROR)
-        )
+            .withStatus(HTTP_INTERNAL_ERROR),
+        ),
       )
 
       val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs

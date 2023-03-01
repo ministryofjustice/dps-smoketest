@@ -20,8 +20,8 @@ class PsiSmokeTestService(
       Flux.from(communityService.setOffenderDetailsTestData(testProfile.crn, firstName, surname)),
       probationSearchService.waitForOffenderToBeFound(testProfile.crn, firstName, surname),
       Flux.from(
-        probationSearchService.assertTestResult(testProfile.crn, firstName, surname)
-      )
+        probationSearchService.assertTestResult(testProfile.crn, firstName, surname),
+      ),
 
     ).takeUntil(TestStatus::hasResult)
   }

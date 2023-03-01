@@ -17,7 +17,7 @@ class JwtAuthHelper(private val keyPair: KeyPair) {
       subject = user,
       scope = listOf("read"),
       expiryTime = Duration.ofHours(1L),
-      roles = roles
+      roles = roles,
     )
     return { it.set(HttpHeaders.AUTHORIZATION, "Bearer $token") }
   }
@@ -27,7 +27,7 @@ class JwtAuthHelper(private val keyPair: KeyPair) {
     scope: List<String>? = listOf(),
     roles: List<String>? = listOf(),
     expiryTime: Duration = Duration.ofHours(1),
-    jwtId: String = UUID.randomUUID().toString()
+    jwtId: String = UUID.randomUUID().toString(),
   ): String =
     mutableMapOf<String, Any>()
       .also { subject?.let { subject -> it["user_name"] = subject } }

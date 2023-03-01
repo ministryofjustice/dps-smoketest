@@ -113,7 +113,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       stubRecallTriggerTest(HTTP_NOT_FOUND)
       doNothing().whenever(queueService).purgeQueue()
       hmppsEventQueue.sqsClient.sendMessage(
-        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build()
+        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build(),
       ).get()
       await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 1 }
     }
@@ -140,11 +140,11 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       stubTriggerTest()
       doNothing().whenever(queueService).purgeQueue()
       hmppsEventQueue.sqsClient.sendMessage(
-        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build()
+        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build(),
       ).get()
       await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 1 }
       hmppsEventQueue.sqsClient.sendMessage(
-        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerRecalled".loadJson()).build()
+        SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerRecalled".loadJson()).build(),
       ).get()
       await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 2 }
     }
@@ -177,23 +177,23 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     PrisonApiExtension.prisonApi.stubFor(
       WireMock.put(WireMock.anyUrl()).willReturn(
         WireMock.aResponse()
-          .withStatus(status)
-      )
+          .withStatus(status),
+      ),
     )
 
   private fun stubReleaseTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
       WireMock.put("/api/smoketest/offenders/A7851DY/release").willReturn(
         WireMock.aResponse()
-          .withStatus(status)
-      )
+          .withStatus(status),
+      ),
     )
   private fun stubRecallTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
       WireMock.put("/api/smoketest/offenders/A7851DY/recall").willReturn(
         WireMock.aResponse()
-          .withStatus(status)
-      )
+          .withStatus(status),
+      ),
     )
 }
 

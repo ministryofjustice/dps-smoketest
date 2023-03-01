@@ -213,7 +213,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
             "institution": { "nomsPrisonInstitutionCode": "WRONG_PRISON" },
             "status": { "code": "D" }
           }
-        """.trimIndent()
+        """.trimIndent(),
       )
     }
 
@@ -252,7 +252,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
             "institution": { "nomsPrisonInstitutionCode": "MDI" },
             "status": { "code": "D" }
           }
-        """.trimIndent()
+        """.trimIndent(),
       )
     }
 
@@ -290,25 +290,25 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
           .withBody(
             """
             { "bookingNo": "38479A", "agencyId": "MDI" }
-            """.trimIndent()
-          )
-      )
+            """.trimIndent(),
+          ),
+      ),
     )
 
   private fun stubResetTestData(status: Int = HTTP_OK) =
     CommunityApiExtension.communityApi.stubFor(
       WireMock.post(WireMock.anyUrl()).willReturn(
         WireMock.aResponse()
-          .withStatus(status)
-      )
+          .withStatus(status),
+      ),
     )
 
   private fun stubTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
       WireMock.post(WireMock.anyUrl()).willReturn(
         WireMock.aResponse()
-          .withStatus(status)
-      )
+          .withStatus(status),
+      ),
     )
 
   private fun stubTestComplete() {
@@ -318,9 +318,9 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
         .whenScenarioStateIs(STARTED)
         .willReturn(
           WireMock.aResponse()
-            .withStatus(HTTP_NOT_FOUND)
+            .withStatus(HTTP_NOT_FOUND),
         )
-        .willSetStateTo("Found")
+        .willSetStateTo("Found"),
     )
     CommunityApiExtension.communityApi.stubFor(
       WireMock.get(WireMock.anyUrl())
@@ -328,9 +328,9 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
         .whenScenarioStateIs("Found")
         .willReturn(
           WireMock.aResponse()
-            .withStatus(HTTP_OK)
+            .withStatus(HTTP_OK),
         )
-        .willSetStateTo("Return results")
+        .willSetStateTo("Return results"),
     )
   }
 
@@ -339,8 +339,8 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
       WireMock.get(WireMock.anyUrl())
         .willReturn(
           WireMock.aResponse()
-            .withStatus(HTTP_NOT_FOUND)
-        )
+            .withStatus(HTTP_NOT_FOUND),
+        ),
     )
   }
 
@@ -353,7 +353,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
           WireMock.aResponse()
             .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .withStatus(status)
-            .withBody(body)
-        )
+            .withBody(body),
+        ),
     )
 }

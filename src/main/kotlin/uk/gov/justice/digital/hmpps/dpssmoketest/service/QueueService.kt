@@ -26,7 +26,7 @@ class QueueService(
   @Value("\${test.maxLengthSeconds}") private val testMaxLengthSeconds: Long,
   @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
   private val objectMapper: ObjectMapper,
-  private val hmppsQueueService: HmppsQueueService
+  private val hmppsQueueService: HmppsQueueService,
 ) {
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -46,27 +46,27 @@ class QueueService(
       .takeUntil(TestStatus::testComplete)
 
   fun checkEventProduced(eventType: String, nomsNumber: String, finalStatus: TestProgress): Mono<TestStatus> {
-
     fun failOnError(exception: Throwable): Mono<out TestStatus> =
       Mono.just(
-        TestStatus("Check $eventType event produced $nomsNumber failed due to ${exception.message}", FAIL)
+        TestStatus("Check $eventType event produced $nomsNumber failed due to ${exception.message}", FAIL),
       )
 
     return Mono.just(checkForEvent(eventType, nomsNumber))
       .map {
-        if (it)
+        if (it) {
           TestStatus("Test for offender $nomsNumber $eventType event finished successfully", finalStatus)
-        else
+        } else {
           TestStatus("Still waiting for offender $nomsNumber $eventType event")
+        }
       }
       .onErrorResume(::failOnError)
   }
 
   fun checkForEvent(eventTypeRequired: String, nomsNumber: String): Boolean {
     var eventFound = false
-    while (hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl)> 0 && !eventFound) {
+    while (hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) > 0 && !eventFound) {
       hmppsEventQueueSqsClient.receiveMessage(
-        ReceiveMessageRequest.builder().queueUrl(hmppsEventQueueUrl).maxNumberOfMessages(1).build()
+        ReceiveMessageRequest.builder().queueUrl(hmppsEventQueueUrl).maxNumberOfMessages(1).build(),
       ).get().messages().firstOrNull()
         ?.also { msg ->
           val (message, messageId, messageAttributes) = objectMapper.readValue(msg.body(), HMPPSMessage::class.java)
@@ -75,7 +75,7 @@ class QueueService(
 
           log.info("Received message $message $messageId type $eventType")
           hmppsEventQueueSqsClient.deleteMessage(
-            DeleteMessageRequest.builder().queueUrl(hmppsEventQueueUrl).receiptHandle(msg.receiptHandle()).build()
+            DeleteMessageRequest.builder().queueUrl(hmppsEventQueueUrl).receiptHandle(msg.receiptHandle()).build(),
           ).get()
           if (eventTypeRequired == eventType && hmppsDomainEvent.additionalInformation.nomsNumber == nomsNumber) eventFound = true
         }
@@ -101,5 +101,5 @@ data class HMPPSMessageAttributes(val eventType: HMPPSEventType)
 data class HMPPSMessage(
   val Message: String,
   val MessageId: String,
-  val MessageAttributes: HMPPSMessageAttributes
+  val MessageAttributes: HMPPSMessageAttributes,
 )

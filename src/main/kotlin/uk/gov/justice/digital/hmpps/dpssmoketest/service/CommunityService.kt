@@ -19,11 +19,10 @@ import java.time.Duration
 class CommunityService(
   @Value("\${test.maxLengthSeconds}") private val testMaxLengthSeconds: Long,
   @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
-  @Qualifier("communityApiWebClient") private val webClient: WebClient
+  @Qualifier("communityApiWebClient") private val webClient: WebClient,
 ) {
 
   fun resetCustodyTestData(crn: String): Mono<TestStatus> {
-
     fun failOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Reset Community test failed. The offender $crn can not be found", FAIL))
 
@@ -41,7 +40,6 @@ class CommunityService(
   }
 
   fun setOffenderDetailsTestData(crn: String, firstName: String, surname: String): Mono<TestStatus> {
-
     fun failOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Update offender details test failed. The offender $crn can not be found", FAIL))
 
@@ -58,8 +56,8 @@ class CommunityService(
               "firstName": "$firstName",
               "surname": "$surname"
             }
-          """.trimIndent()
-        )
+          """.trimIndent(),
+        ),
       )
       .retrieve()
       .toBodilessEntity()
@@ -75,7 +73,6 @@ class CommunityService(
       .takeUntil(TestStatus::testComplete)
 
   fun checkCustodyTestComplete(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
-
     fun testIncompleteOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Still waiting for offender $nomsNumber with booking $bookNumber to be updated"))
 
@@ -92,7 +89,6 @@ class CommunityService(
   }
 
   fun checkOffenderExists(crn: String): Mono<TestStatus> {
-
     fun failOnError(exception: Throwable): Mono<out TestStatus> =
       Mono.just(TestStatus("Offender we expected to exist $crn failed due to  ${exception.message}", FAIL))
 
@@ -109,7 +105,6 @@ class CommunityService(
   }
 
   fun assertTestResult(nomsNumber: String, bookingNumber: String, prisonCode: String): Mono<TestStatus> {
-
     fun failOnError(exception: Throwable): Mono<out TestStatus> =
       Mono.just(TestStatus("Check test results for $nomsNumber failed due to ${exception.message}", FAIL))
 
@@ -118,7 +113,7 @@ class CommunityService(
         ?.let { TestStatus("Test for offender $nomsNumber with booking $bookingNumber finished successfully", SUCCESS) }
         ?: TestStatus(
           "Test for offender $nomsNumber with booking $bookingNumber failed with custodyDetails=$this",
-          FAIL
+          FAIL,
         )
     }
       .onErrorResume(::failOnError)

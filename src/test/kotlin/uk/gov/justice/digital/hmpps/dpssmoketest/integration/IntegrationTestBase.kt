@@ -27,7 +27,7 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
   OAuthExtension::class,
   CommunityApiExtension::class,
   PrisonApiExtension::class,
-  ProbationOffenderSearchExtension::class
+  ProbationOffenderSearchExtension::class,
 )
 abstract class IntegrationTestBase {
 

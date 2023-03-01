@@ -19,7 +19,7 @@ class ProbationOffenderSearchExtension : BeforeAllCallback, AfterAllCallback, Be
   companion object {
     @JvmField
     val probationOffenderSearch = ProbationOffenderSearchMockServer(
-      wireMockConfig().extensions(SearchBodyTransformer::class.java)
+      wireMockConfig().extensions(SearchBodyTransformer::class.java),
     )
   }
 
@@ -60,7 +60,7 @@ class SearchBodyTransformer : ResponseDefinitionTransformer() {
                 "surname": "${requestBody.surname}"
              }
             ]
-        """.trimIndent()
+        """.trimIndent(),
       )
       .build()
   }

@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.1-beta-2"
   kotlin("plugin.spring") version "1.8.10"
 }
 
@@ -24,20 +24,20 @@ dependencies {
 
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-  testImplementation("io.projectreactor:reactor-test:3.5.2")
+  testImplementation("io.projectreactor:reactor-test:3.5.3")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
-  testImplementation("io.opentelemetry:opentelemetry-sdk-testing:1.22.0")
+  testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(18))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(19))
 }
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "18"
+      jvmTarget = "19"
     }
   }
 }

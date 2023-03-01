@@ -13,7 +13,7 @@ data class PtpuTestInputs(
   val nomsNumber: String,
   val bookingNumber: String,
   val prisonCode: String,
-  val testStatus: TestStatus
+  val testStatus: TestStatus,
 )
 
 @Service
@@ -32,8 +32,8 @@ class PtpuSmokeTestService(
           communityService.waitForTestToComplete(it.nomsNumber, it.bookingNumber),
           waitForUpdates(),
           Flux.from(
-            communityService.assertTestResult(it.nomsNumber, it.bookingNumber, it.prisonCode)
-          )
+            communityService.assertTestResult(it.nomsNumber, it.bookingNumber, it.prisonCode),
+          ),
         ).takeUntil(TestStatus::hasResult)
       }
   }
