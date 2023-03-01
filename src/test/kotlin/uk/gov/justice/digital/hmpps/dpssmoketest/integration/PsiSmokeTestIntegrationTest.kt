@@ -227,9 +227,10 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
             """{
                 "firstName" : "PSI",
                 "surname": "Smoketest"
-            }""".trimMargin()
-          )
-        )
+            }
+            """.trimMargin(),
+          ),
+        ),
       )
       assertThat(getLastRequest().request.bodyAsString).contains("PSI").contains("Smoketest")
     }
@@ -256,9 +257,9 @@ private fun stubCheckOffenderExists(status: Int = HTTP_OK) =
         .withBody(
           """
             { "firstName": "Jane", "surname": "Smith" }
-          """.trimIndent()
-        )
-    )
+          """.trimIndent(),
+        ),
+    ),
   )
 
 private fun stubChangeOffenderName(status: Int = HTTP_OK) =
@@ -266,8 +267,8 @@ private fun stubChangeOffenderName(status: Int = HTTP_OK) =
     WireMock.post(WireMock.anyUrl()).willReturn(
       WireMock.aResponse()
         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .withStatus(status)
-    )
+        .withStatus(status),
+    ),
   )
 
 private fun stubTestNeverCompletes() {
@@ -279,9 +280,9 @@ private fun stubTestNeverCompletes() {
         .withBody(
           """
             []
-          """.trimIndent()
-        )
-    )
+          """.trimIndent(),
+        ),
+    ),
   )
 }
 
@@ -297,10 +298,10 @@ private fun stubTestWillCompleteSuccessfully() {
           .withBody(
             """
             []
-            """.trimIndent()
-          )
+            """.trimIndent(),
+          ),
       )
-      .willSetStateTo("Found")
+      .willSetStateTo("Found"),
   )
   ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
@@ -310,9 +311,9 @@ private fun stubTestWillCompleteSuccessfully() {
         WireMock.aResponse()
           .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
           .withStatus(HTTP_OK)
-          .withTransformers("search-body")
+          .withTransformers("search-body"),
       )
-      .willSetStateTo("Found")
+      .willSetStateTo("Found"),
   )
 }
 
@@ -328,10 +329,10 @@ private fun stubTestCompletesWithNonMatch() {
           .withBody(
             """
             []
-            """.trimIndent()
-          )
+            """.trimIndent(),
+          ),
       )
-      .willSetStateTo("Found")
+      .willSetStateTo("Found"),
   )
   ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
@@ -352,10 +353,10 @@ private fun stubTestCompletesWithNonMatch() {
                 "surname": "Bones"
              }
             ]
-            """.trimIndent()
-          )
+            """.trimIndent(),
+          ),
 
       )
-      .willSetStateTo("Found")
+      .willSetStateTo("Found"),
   )
 }

@@ -10,11 +10,10 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Test
 @Service
 class PoeSmokeTestService(
   private val prisonService: PrisonService,
-  private val queueService: QueueService
+  private val queueService: QueueService,
 
 ) {
   fun runSmokeTest(testProfile: PoeTestParameters): Flux<TestStatus> {
-
     queueService.purgeQueue()
 
     return Flux.concat(
@@ -22,9 +21,10 @@ class PoeSmokeTestService(
       Flux.from(prisonService.triggerPoeReleaseTest(testProfile.nomsNumber)),
       Flux.from(
         queueService.waitForEventToBeProduced(
-          "prison-offender-events.prisoner.released", testProfile.nomsNumber,
-          COMPLETE
-        )
+          "prison-offender-events.prisoner.released",
+          testProfile.nomsNumber,
+          COMPLETE,
+        ),
       ),
       Flux.just(TestStatus("Will recall prisoner ${testProfile.nomsNumber}", INCOMPLETE)),
       Flux.from(prisonService.triggerPoeRecallTest(testProfile.nomsNumber)),

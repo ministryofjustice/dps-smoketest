@@ -16,7 +16,7 @@ import java.time.Duration
 class ProbationSearchService(
   @Value("\${test.maxLengthSeconds}") private val testMaxLengthSeconds: Long,
   @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
-  @Qualifier("probationOffenderSearchWebClient") private val webClient: WebClient
+  @Qualifier("probationOffenderSearchWebClient") private val webClient: WebClient,
 ) {
   fun waitForOffenderToBeFound(crn: String, firstName: String, surname: String): Flux<SmokeTestResource.TestStatus> =
     Flux.interval(Duration.ofMillis(testResultPollMs))
@@ -25,13 +25,12 @@ class ProbationSearchService(
       .takeUntil(SmokeTestResource.TestStatus::testComplete)
 
   fun checkSearchTestComplete(crn: String, firstName: String, surname: String): Mono<SmokeTestResource.TestStatus> {
-
     fun failOnError(exception: Throwable): Mono<out SmokeTestResource.TestStatus> =
       Mono.just(
         SmokeTestResource.TestStatus(
           "Check test results for $crn failed due to ${exception.message}",
-          SmokeTestResource.TestStatus.TestProgress.FAIL
-        )
+          SmokeTestResource.TestStatus.TestProgress.FAIL,
+        ),
       )
 
     return searchForOffender(crn, firstName, surname)
@@ -41,7 +40,7 @@ class ProbationSearchService(
         } else {
           SmokeTestResource.TestStatus(
             "Offender $crn found with name ${it[0].firstName} ${it[0].surname}",
-            SmokeTestResource.TestStatus.TestProgress.COMPLETE
+            SmokeTestResource.TestStatus.TestProgress.COMPLETE,
           )
         }
       }
@@ -49,13 +48,12 @@ class ProbationSearchService(
   }
 
   fun assertTestResult(crn: String, firstName: String, surname: String): Mono<SmokeTestResource.TestStatus> {
-
     fun failOnError(exception: Throwable): Mono<out SmokeTestResource.TestStatus> =
       Mono.just(
         SmokeTestResource.TestStatus(
           "Check test results for $crn failed due to ${exception.message}",
-          SmokeTestResource.TestStatus.TestProgress.FAIL
-        )
+          SmokeTestResource.TestStatus.TestProgress.FAIL,
+        ),
       )
 
     return searchForOffender(crn, firstName, surname).map {
@@ -66,7 +64,7 @@ class ProbationSearchService(
         if (offenderDetails.firstName == firstName && offenderDetails.surname == surname && offenderDetails.otherIds.crn == crn) {
           SmokeTestResource.TestStatus(
             "Test for offender $crn finished successfully",
-            SmokeTestResource.TestStatus.TestProgress.SUCCESS
+            SmokeTestResource.TestStatus.TestProgress.SUCCESS,
           )
         } else {
           SmokeTestResource.TestStatus("The offender $crn was not found with name $firstName $surname", SmokeTestResource.TestStatus.TestProgress.FAIL)
@@ -87,7 +85,7 @@ class ProbationSearchService(
   private fun searchByCrnNameBody(
     crn: String,
     firstName: String,
-    surname: String
+    surname: String,
   ) = BodyInserters.fromValue(
     """
               {
@@ -95,7 +93,7 @@ class ProbationSearchService(
                 "firstName": "$firstName",
                 "surname": "$surname"
               }
-    """.trimIndent()
+    """.trimIndent(),
   )
 }
 

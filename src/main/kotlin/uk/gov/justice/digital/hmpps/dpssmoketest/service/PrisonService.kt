@@ -13,10 +13,9 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Test
 
 @Service
 class PrisonService(
-  @Qualifier("prisonApiWebClient") private val webClient: WebClient
+  @Qualifier("prisonApiWebClient") private val webClient: WebClient,
 ) {
   fun triggerPtpuTest(nomsNumber: String): Mono<TestStatus> {
-
     fun failOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
 
@@ -34,7 +33,6 @@ class PrisonService(
   }
 
   fun getPtpuTestInputs(nomsNumber: String, crn: String): Mono<PtpuTestInputs> {
-
     data class OffenderDetails(val bookingNo: String, val agencyId: String)
 
     fun failToGetTestInputs(exception: Throwable): Mono<out PtpuTestInputs> =
@@ -44,8 +42,8 @@ class PrisonService(
           nomsNumber = nomsNumber,
           bookingNumber = "NOT FOUND",
           prisonCode = "NOT FOUND",
-          testStatus = TestStatus("Unable to gather the test inputs due to exception ${exception.message}", FAIL)
-        )
+          testStatus = TestStatus("Unable to gather the test inputs due to exception ${exception.message}", FAIL),
+        ),
       )
 
     return webClient.get()
@@ -59,14 +57,13 @@ class PrisonService(
           nomsNumber = nomsNumber,
           bookingNumber = it.bookingNo,
           prisonCode = it.agencyId,
-          testStatus = TestStatus("Retrieved test inputs: $it")
+          testStatus = TestStatus("Retrieved test inputs: $it"),
         )
       }
       .onErrorResume(::failToGetTestInputs)
   }
 
   fun triggerPoeReleaseTest(nomsNumber: String): Mono<TestStatus> {
-
     fun failOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
 
@@ -83,7 +80,6 @@ class PrisonService(
   }
 
   fun triggerPoeRecallTest(nomsNumber: String): Mono<TestStatus> {
-
     fun failOnNotFound(): Mono<out TestStatus> =
       Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
 
