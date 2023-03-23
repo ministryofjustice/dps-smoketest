@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.1-beta-3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.3-beta"
   kotlin("plugin.spring") version "1.8.10"
 }
 
@@ -19,12 +19,12 @@ dependencies {
 
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:2.0.0-beta-13")
 
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
   implementation("org.awaitility:awaitility-kotlin:4.2.0")
 
   testImplementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-  testImplementation("io.projectreactor:reactor-test:3.5.3")
+  testImplementation("io.projectreactor:reactor-test:3.5.4")
   testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
