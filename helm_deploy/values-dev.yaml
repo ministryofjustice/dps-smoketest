@@ -5,7 +5,11 @@ generic-service:
   replicaCount: 2
   ingress:
     host: dps-smoketest-dev.hmpps.service.justice.gov.uk
-    contextColour: green
+
+  scheduledDowntime:
+    enabled: true
+    startup: '7 6 * * 1-5' # Start at 6.07am UTC Monday-Friday
+    shutdown: '59 21 * * 1-5' # Stop at 9.59pm UTC Monday-Friday
 
   env:
     OAUTH_ENDPOINT_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
