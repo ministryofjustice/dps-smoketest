@@ -21,6 +21,7 @@ generic-service:
     JAVA_OPTS: "-Xmx512m"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY)"
     SPRING_PROFILES_ACTIVE: "logstash"
+    HMPPS_SQS_USE_WEB_TOKEN: "true"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -33,8 +34,6 @@ generic-service:
       OAUTH_CLIENT_ID: "OAUTH_CLIENT_ID"
       OAUTH_CLIENT_SECRET: "OAUTH_CLIENT_SECRET"
     dps-smoketest-queue-secret:
-      HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_ACCESS_KEY_ID: "access_key_id"
-      HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_SECRET_ACCESS_KEY: "secret_access_key"
       HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_NAME: "sqs_queue_name"
 
   allowlist:
