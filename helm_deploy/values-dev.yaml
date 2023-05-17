@@ -6,6 +6,8 @@ generic-service:
   ingress:
     host: dps-smoketest-dev.hmpps.service.justice.gov.uk
 
+  serviceAccountName: dps-smoketest-dev
+
   scheduledDowntime:
     enabled: true
     startup: '7 6 * * 1-5' # Start at 6.07am UTC Monday-Friday
