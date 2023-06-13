@@ -4,6 +4,8 @@
 generic-service:
   nameOverride: dps-smoketest
 
+  serviceAccountName: dps-smoketest
+
   image:
     repository: quay.io/hmpps/dps-smoketest
     tag: app_version    # override at deployment time
