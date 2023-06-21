@@ -1,13 +1,6 @@
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          public-key-location: classpath:local-public-key.pub
-
 oauth:
   endpoint:
-    url: http://localhost:8080
+    url: http://localhost:8090/auth
 
 prisonapi:
   endpoint.url: http://localhost:8093
