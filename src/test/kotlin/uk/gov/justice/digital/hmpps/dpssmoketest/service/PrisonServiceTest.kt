@@ -40,10 +40,10 @@ class PrisonServiceTest : IntegrationTestBase() {
         ),
       )
 
-      service.triggerPtpuTest("A7742DY").block()
+      service.triggerPtpuTest("A4799DZ").block()
 
       PrisonApiExtension.prisonApi.verify(
-        postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7742DY/imprisonment-status"))
+        postRequestedFor(urlEqualTo("/api/smoketest/offenders/A4799DZ/imprisonment-status"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
@@ -58,7 +58,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(INCOMPLETE)
+      assertThat(service.triggerPtpuTest("A4799DZ").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -70,7 +70,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.triggerPtpuTest("A4799DZ").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -82,7 +82,7 @@ class PrisonServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.triggerPtpuTest("A7742DY").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.triggerPtpuTest("A4799DZ").block()?.progress).isEqualTo(FAIL)
     }
   }
 
@@ -98,16 +98,16 @@ class PrisonServiceTest : IntegrationTestBase() {
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .withBody(
               """
-              {"bookingNo": "38479A", "agencyId": "MDI" }
+              {"bookingNo": "45135A", "agencyId": "MDI" }
               """.trimIndent(),
             ),
         ),
       )
 
-      service.getPtpuTestInputs("A7742DY", "X360040").block()
+      service.getPtpuTestInputs("A4799DZ", "X693742").block()
 
       PrisonApiExtension.prisonApi.verify(
-        getRequestedFor(urlEqualTo("/api/bookings/offenderNo/A7742DY"))
+        getRequestedFor(urlEqualTo("/api/bookings/offenderNo/A4799DZ"))
           .withHeader("Content-Type", equalTo("application/json"))
           .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
@@ -122,18 +122,18 @@ class PrisonServiceTest : IntegrationTestBase() {
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .withBody(
               """
-              {"bookingNo": "38479A", "agencyId": "MDI" }
+              {"bookingNo": "45135A", "agencyId": "MDI" }
               """.trimIndent(),
             ),
         ),
       )
 
-      val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
+      val result = service.getPtpuTestInputs("A4799DZ", "X693742").block() as PtpuTestInputs
 
       assertThat(result.testStatus.progress == INCOMPLETE)
-      assertThat(result.nomsNumber).isEqualTo("A7742DY")
-      assertThat(result.crn).isEqualTo("X360040")
-      assertThat(result.bookingNumber).isEqualTo("38479A")
+      assertThat(result.nomsNumber).isEqualTo("A4799DZ")
+      assertThat(result.crn).isEqualTo("X693742")
+      assertThat(result.bookingNumber).isEqualTo("45135A")
       assertThat(result.prisonCode).isEqualTo("MDI")
     }
 
@@ -146,11 +146,11 @@ class PrisonServiceTest : IntegrationTestBase() {
         ),
       )
 
-      val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
+      val result = service.getPtpuTestInputs("A4799DZ", "X693742").block() as PtpuTestInputs
 
       assertThat(result.testStatus.progress == FAIL)
-      assertThat(result.nomsNumber).isEqualTo("A7742DY")
-      assertThat(result.crn).isEqualTo("X360040")
+      assertThat(result.nomsNumber).isEqualTo("A4799DZ")
+      assertThat(result.crn).isEqualTo("X693742")
       assertThat(result.bookingNumber).isEqualTo("NOT FOUND")
       assertThat(result.prisonCode).isEqualTo("NOT FOUND")
     }
@@ -164,11 +164,11 @@ class PrisonServiceTest : IntegrationTestBase() {
         ),
       )
 
-      val result = service.getPtpuTestInputs("A7742DY", "X360040").block() as PtpuTestInputs
+      val result = service.getPtpuTestInputs("A4799DZ", "X693742").block() as PtpuTestInputs
 
       assertThat(result.testStatus.progress == FAIL)
-      assertThat(result.nomsNumber).isEqualTo("A7742DY")
-      assertThat(result.crn).isEqualTo("X360040")
+      assertThat(result.nomsNumber).isEqualTo("A4799DZ")
+      assertThat(result.crn).isEqualTo("X693742")
       assertThat(result.bookingNumber).isEqualTo("NOT FOUND")
       assertThat(result.prisonCode).isEqualTo("NOT FOUND")
     }

@@ -100,10 +100,10 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      service.checkCustodyTestComplete("A7742DY", "38479A").block()
+      service.checkCustodyTestComplete("A4799DZ", "45135A").block()
 
       CommunityApiExtension.communityApi.verify(
-        getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A7742DY/custody/bookingNumber/38479A"))
+        getRequestedFor(urlEqualTo("/secure/offenders/nomsNumber/A4799DZ/custody/bookingNumber/45135A"))
           .withHeader("Authorization", equalTo("Bearer ABCDE")),
       )
     }
@@ -117,7 +117,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(COMPLETE)
+      assertThat(service.checkCustodyTestComplete("X12345", "45135A").block()?.progress).isEqualTo(COMPLETE)
     }
 
     @Test
@@ -129,7 +129,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(INCOMPLETE)
+      assertThat(service.checkCustodyTestComplete("X12345", "45135A").block()?.progress).isEqualTo(INCOMPLETE)
     }
 
     @Test
@@ -141,7 +141,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.checkCustodyTestComplete("X12345", "38479A").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.checkCustodyTestComplete("X12345", "45135A").block()?.progress).isEqualTo(FAIL)
     }
   }
 
@@ -158,7 +158,7 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.assertTestResult("X12345", "45135A", "MDI").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
@@ -171,19 +171,19 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(FAIL)
+      assertThat(service.assertTestResult("X12345", "45135A", "MDI").block()?.progress).isEqualTo(FAIL)
     }
 
     @Test
     fun `will succeed with matching data`() {
       CommunityApiExtension.communityApi.stubFor(
-        get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/38479A")).willReturn(
+        get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/45135A")).willReturn(
           aResponse()
             .withStatus(HTTP_OK)
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .withBody(
               """
-              { "bookingNumber": "38479A",
+              { "bookingNumber": "45135A",
                 "institution": { "nomsPrisonInstitutionCode": "MDI" },
                 "status": { "code": "D" }
               }
@@ -192,14 +192,14 @@ class CommunityServiceTest : IntegrationTestBase() {
         ),
       )
 
-      assertThat(service.assertTestResult("X12345", "38479A", "MDI").block()?.progress).isEqualTo(SUCCESS)
+      assertThat(service.assertTestResult("X12345", "45135A", "MDI").block()?.progress).isEqualTo(SUCCESS)
     }
 
     @ParameterizedTest
     @CsvSource(
-      "X12345, 38479A, WRONG",
+      "X12345, 45135A, WRONG",
       "X12345, WRONG,  MDI",
-      "WRONG,  38479A, MDI",
+      "WRONG,  45135A, MDI",
     )
     fun `will fail with bad data`(
       nomsNumber: String,
@@ -207,13 +207,13 @@ class CommunityServiceTest : IntegrationTestBase() {
       prisonCode: String,
     ) {
       CommunityApiExtension.communityApi.stubFor(
-        get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/38479A")).willReturn(
+        get(urlEqualTo("/secure/offenders/nomsNumber/X12345/custody/bookingNumber/45135A")).willReturn(
           aResponse()
             .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .withStatus(HTTP_OK)
             .withBody(
               """
-              { "bookingNumber": "38479A",
+              { "bookingNumber": "45135A",
                 "institution": { "nomsPrisonInstitutionCode": "MDI" },
                 "status": { "code": "D" }
               }
