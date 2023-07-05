@@ -110,7 +110,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestStatus("Reset Community test failed. The offender X360040 can not be found", FAIL))
+        .expectNext(TestStatus("Reset Community test failed. The offender X693742 can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -131,8 +131,8 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestStatus("Reset Community test data for X360040"))
-        .expectNext(TestStatus("Trigger test failed. The offender A7742DY can not be found", FAIL))
+        .expectNext(TestStatus("Reset Community test data for X693742"))
+        .expectNext(TestStatus("Trigger test failed. The offender A4799DZ can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -154,12 +154,12 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestStatus("Reset Community test data for X360040"))
-        .expectNext(TestStatus("Triggered test for A7742DY"))
-        .expectNextSequence(List(9) { TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated") })
+        .expectNext(TestStatus("Reset Community test data for X693742"))
+        .expectNext(TestStatus("Triggered test for A4799DZ"))
+        .expectNextSequence(List(9) { TestStatus("Still waiting for offender A4799DZ with booking 45135A to be updated") })
         .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNextMatches { testResult ->
-          testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
+          testResult.description.contains("Check test results for A4799DZ failed due to 404 Not Found") &&
             testResult.progress == FAIL
         }
         .verifyComplete()
@@ -184,13 +184,13 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestStatus("Reset Community test data for X360040"))
-        .expectNext(TestStatus("Triggered test for A7742DY"))
-        .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Reset Community test data for X693742"))
+        .expectNext(TestStatus("Triggered test for A4799DZ"))
+        .expectNext(TestStatus("Still waiting for offender A4799DZ with booking 45135A to be updated"))
+        .expectNext(TestStatus("Test for offender A4799DZ with booking 45135A has completed", COMPLETE))
         .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNextMatches { testResult ->
-          testResult.description.contains("Check test results for A7742DY failed due to 404 Not Found") &&
+          testResult.description.contains("Check test results for A4799DZ failed due to 404 Not Found") &&
             testResult.progress == FAIL
         }
         .verifyComplete()
@@ -209,7 +209,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
       stubGetCustodyDetails(
         body =
         """
-          { "bookingNumber": "38479A",
+          { "bookingNumber": "45135A",
             "institution": { "nomsPrisonInstitutionCode": "WRONG_PRISON" },
             "status": { "code": "D" }
           }
@@ -223,13 +223,13 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestStatus("Reset Community test data for X360040"))
-        .expectNext(TestStatus("Triggered test for A7742DY"))
-        .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Reset Community test data for X693742"))
+        .expectNext(TestStatus("Triggered test for A4799DZ"))
+        .expectNext(TestStatus("Still waiting for offender A4799DZ with booking 45135A to be updated"))
+        .expectNext(TestStatus("Test for offender A4799DZ with booking 45135A has completed", COMPLETE))
         .expectNext(TestStatus("Waiting for final update", COMPLETE))
         .expectNextMatches { testResult ->
-          testResult.description.contains("Test for offender A7742DY with booking 38479A failed with custodyDetails") &&
+          testResult.description.contains("Test for offender A4799DZ with booking 45135A failed with custodyDetails") &&
             testResult.progress == FAIL
         }
         .verifyComplete()
@@ -248,7 +248,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
       stubGetCustodyDetails(
         body =
         """
-          { "bookingNumber": "38479A",
+          { "bookingNumber": "45135A",
             "institution": { "nomsPrisonInstitutionCode": "MDI" },
             "status": { "code": "D" }
           }
@@ -262,12 +262,12 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody)
         .expectNextMatches { testResult -> testResult.description.contains("Retrieved test inputs") }
-        .expectNext(TestStatus("Reset Community test data for X360040"))
-        .expectNext(TestStatus("Triggered test for A7742DY"))
-        .expectNext(TestStatus("Still waiting for offender A7742DY with booking 38479A to be updated"))
-        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A has completed", COMPLETE))
+        .expectNext(TestStatus("Reset Community test data for X693742"))
+        .expectNext(TestStatus("Triggered test for A4799DZ"))
+        .expectNext(TestStatus("Still waiting for offender A4799DZ with booking 45135A to be updated"))
+        .expectNext(TestStatus("Test for offender A4799DZ with booking 45135A has completed", COMPLETE))
         .expectNext(TestStatus("Waiting for final update", COMPLETE))
-        .expectNext(TestStatus("Test for offender A7742DY with booking 38479A finished successfully", SUCCESS))
+        .expectNext(TestStatus("Test for offender A4799DZ with booking 45135A finished successfully", SUCCESS))
         .verifyComplete()
     }
   }
@@ -289,7 +289,7 @@ class PtpuSmokeTestIntegrationTest : IntegrationTestBase() {
           .withStatus(status)
           .withBody(
             """
-            { "bookingNo": "38479A", "agencyId": "MDI" }
+            { "bookingNo": "45135A", "agencyId": "MDI" }
             """.trimIndent(),
           ),
       ),
