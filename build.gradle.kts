@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.5.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.5.1"
   kotlin("plugin.spring") version "1.9.10"
 }
 
@@ -19,9 +19,9 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
   implementation("org.awaitility:awaitility-kotlin:4.2.0")
 
-  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.0")
-  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.0")
-  testImplementation("io.projectreactor:reactor-test:3.5.10")
+  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.2")
+  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.2")
+  testImplementation("io.projectreactor:reactor-test:3.5.11")
   testImplementation("org.wiremock:wiremock:3.2.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
@@ -36,10 +36,5 @@ tasks {
     kotlinOptions {
       jvmTarget = "20"
     }
-  }
-
-  test {
-    // required for jjwt 0.12 - see https://github.com/jwtk/jjwt/issues/849
-    jvmArgs("--add-exports", "java.base/sun.security.util=ALL-UNNAMED")
   }
 }
