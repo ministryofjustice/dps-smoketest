@@ -25,31 +25,15 @@ class WebClientConfiguration(
 
   @Bean
   fun communityApiWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
-    authorisedWebClient(authorizedClientManager, builder, registrationId = "community-api", url = communityRootUri)
+    builder.authorisedWebClient(authorizedClientManager, registrationId = "community-api", url = communityRootUri, timeout)
 
   @Bean
   fun prisonApiWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
-    authorisedWebClient(authorizedClientManager, builder, registrationId = "prison-api", url = prisonapiRootUri)
+    builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonapiRootUri, timeout)
 
   @Bean
   fun probationOffenderSearchWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
-    authorisedWebClient(authorizedClientManager, builder, registrationId = "probation-offender-search", url = probationOffenderSearchUri)
-
-  private fun authorisedWebClient(
-    authorizedClientManager: OAuth2AuthorizedClientManager,
-    builder: WebClient.Builder,
-    registrationId: String,
-    url: String,
-  ): WebClient {
-    val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager).kotlinApply {
-      setDefaultClientRegistrationId(registrationId)
-    }
-
-    return builder.baseUrl(url)
-      .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(timeout)))
-      .filter(oauth2Client)
-      .build()
-  }
+    builder.authorisedWebClient(authorizedClientManager, registrationId = "probation-offender-search", url = probationOffenderSearchUri, timeout)
 
   @Bean
   fun authorizedClientManager(
@@ -62,4 +46,15 @@ class WebClientConfiguration(
       oAuth2AuthorizedClientService,
     ).kotlinApply { setAuthorizedClientProvider(authorizedClientProvider) }
   }
+}
+
+fun WebClient.Builder.authorisedWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, registrationId: String, url: String, timeout: Duration): WebClient {
+  val oauth2Client = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager).kotlinApply {
+    setDefaultClientRegistrationId(registrationId)
+  }
+
+  return baseUrl(url)
+    .clientConnector(ReactorClientHttpConnector(HttpClient.create().responseTimeout(timeout)))
+    .filter(oauth2Client)
+    .build()
 }
