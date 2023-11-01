@@ -35,7 +35,7 @@ generic-service:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
       OAUTH_CLIENT_ID: "OAUTH_CLIENT_ID"
       OAUTH_CLIENT_SECRET: "OAUTH_CLIENT_SECRET"
-    dps-smoketest-queue-secret:
+    domain-events-dps-smoketest-queue:
       HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_NAME: "sqs_queue_name"
 
   allowlist:
@@ -48,3 +48,4 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: dps-smoketest
+  alertSeverity: syscon
