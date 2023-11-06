@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName")
+
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -93,7 +95,7 @@ class QueueService(
       .let { it.get().attributes()[QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES]?.toInt() ?: 0 }
 }
 
-data class AdditionalInformation(val nomsNumber: String, val details: String, val reason: String, val prisonId: String)
+data class AdditionalInformation(val nomsNumber: String, val details: String?, val reason: String, val prisonId: String)
 data class HMPPSDomainEvent(val additionalInformation: AdditionalInformation)
 
 data class HMPPSEventType(val Value: String, val Type: String)
