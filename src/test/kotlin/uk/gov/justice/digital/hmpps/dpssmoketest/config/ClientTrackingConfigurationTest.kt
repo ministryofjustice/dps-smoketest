@@ -20,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.findLogAppender
 
-@Import(JwtAuthHelper::class, JwtConfig::class, ClientTrackingInterceptor::class, ClientTrackingConfiguration::class)
+@Import(JwtAuthHelper::class, ClientTrackingInterceptor::class, ClientTrackingConfiguration::class)
 @ContextConfiguration(initializers = [ConfigDataApplicationContextInitializer::class])
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension::class)

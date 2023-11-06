@@ -2,13 +2,11 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import com.github.tomakehurst.wiremock.extension.Parameters
-import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer
-import com.github.tomakehurst.wiremock.http.Request
+import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformerV2
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
+import com.github.tomakehurst.wiremock.stubbing.ServeEvent
 import com.google.gson.Gson
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
@@ -42,15 +40,16 @@ class ProbationOffenderSearchMockServer(config: WireMockConfiguration) : WireMoc
   }
 }
 
-class SearchBodyTransformer : ResponseDefinitionTransformer() {
-  override fun transform(request: Request, responseDefinition: ResponseDefinition, files: FileSource?, parameters: Parameters?): ResponseDefinition {
-    val requestBody: SearchRequest = Gson().fromJson(request.bodyAsString, SearchRequest::class.java)
-    // echo request main attributes in body to simulate perfect match
-    return ResponseDefinitionBuilder()
-      .withHeaders(responseDefinition.headers)
-      .withStatus(responseDefinition.status)
-      .withBody(
-        """
+class SearchBodyTransformer : ResponseDefinitionTransformerV2 {
+  override fun transform(serveEvent: ServeEvent): ResponseDefinition {
+    with(serveEvent) {
+      val requestBody: SearchRequest = Gson().fromJson(request.bodyAsString, SearchRequest::class.java)
+      // echo request main attributes in body to simulate perfect match
+      return ResponseDefinitionBuilder()
+        .withHeaders(responseDefinition.headers)
+        .withStatus(responseDefinition.status)
+        .withBody(
+          """
             [
              {
                 "otherIds": {
@@ -60,9 +59,10 @@ class SearchBodyTransformer : ResponseDefinitionTransformer() {
                 "surname": "${requestBody.surname}"
              }
             ]
-        """.trimIndent(),
-      )
-      .build()
+          """.trimIndent(),
+        )
+        .build()
+    }
   }
 
   override fun getName(): String {

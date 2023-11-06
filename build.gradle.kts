@@ -25,6 +25,10 @@ dependencies {
   testImplementation("org.wiremock:wiremock:3.2.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.18") {
+    exclude(group = "io.swagger.core.v3")
+  }
+  testImplementation("io.swagger.core.v3:swagger-core-jakarta:2.2.18")
 }
 
 kotlin {
