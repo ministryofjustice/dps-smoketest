@@ -25,4 +25,4 @@ generic-prometheus-alerts:
   businessHoursOnly: true
 
   sqsAlertsQueueNames:
-    - "syscon-devs-dev-dps_smoketest_dev_hmpps_queue"
+    - "Digital-Prison-Services-prod-dps_smoketest_dev_hmpps_queue"
