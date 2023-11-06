@@ -1,16 +1,26 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.helper
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.stereotype.Component
 import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.interfaces.RSAPublicKey
 import java.time.Duration
 import java.util.Date
 import java.util.UUID
 
 @Component
-class JwtAuthHelper(private val keyPair: KeyPair) {
+class JwtAuthHelper() {
+  private val keyPair: KeyPair = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.generateKeyPair()
+
+  @Bean
+  @Primary
+  fun jwtDecoder(): JwtDecoder = NimbusJwtDecoder.withPublicKey(keyPair.public as RSAPublicKey).build()
 
   fun setAuthorisation(user: String = "dps-smoketest-client", roles: List<String> = listOf()): (HttpHeaders) -> Unit {
     val token = createJwt(
@@ -36,11 +46,11 @@ class JwtAuthHelper(private val keyPair: KeyPair) {
       .also { scope?.let { scope -> it["scope"] = scope } }
       .let {
         Jwts.builder()
-          .setId(jwtId)
-          .setSubject(subject)
-          .addClaims(it.toMap())
-          .setExpiration(Date(System.currentTimeMillis() + expiryTime.toMillis()))
-          .signWith(keyPair.private, SignatureAlgorithm.RS256)
+          .id(jwtId)
+          .subject(subject)
+          .claims(it.toMap())
+          .expiration(Date(System.currentTimeMillis() + expiryTime.toMillis()))
+          .signWith(keyPair.private, Jwts.SIG.RS256)
           .compact()
       }
 }

@@ -1,9 +1,17 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
+import io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat
+import io.swagger.v3.parser.OpenAPIV3Parser
+import net.minidev.json.JSONArray
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.MediaType
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class OpenApiDocsTest : IntegrationTestBase() {
+  @LocalServerPort
+  private val port: Int = 0
 
   @Test
   fun `open api docs are available`() {
@@ -25,12 +33,45 @@ class OpenApiDocsTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `the swagger json is valid`() {
+  fun `the open api json contains documentation`() {
     webTestClient.get()
       .uri("/v3/api-docs")
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody().jsonPath("messages").doesNotExist()
+      .expectBody()
+      .jsonPath("paths").isNotEmpty
+  }
+
+  @Test
+  fun `the open api json contains the version number`() {
+    webTestClient.get()
+      .uri("/v3/api-docs")
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody().jsonPath("info.version").isEqualTo(DateTimeFormatter.ISO_DATE.format(LocalDate.now()))
+  }
+
+  @Test
+  fun `the open api json is valid and contains documentation`() {
+    val result = OpenAPIV3Parser().readLocation("http://localhost:$port/v3/api-docs", null, null)
+    assertThat(result.messages).isEmpty()
+    assertThat(result.openAPI.paths).isNotEmpty
+  }
+
+  @Test
+  fun `the security scheme is setup for bearer tokens`() {
+    webTestClient.get()
+      .uri("/v3/api-docs")
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .jsonPath("$.components.securitySchemes.smoke-test-security-scheme.type").isEqualTo("http")
+      .jsonPath("$.components.securitySchemes.smoke-test-security-scheme.scheme").isEqualTo("bearer")
+      .jsonPath("$.components.securitySchemes.smoke-test-security-scheme.bearerFormat").isEqualTo("JWT")
+      .jsonPath("$.security[0].smoke-test-security-scheme")
+      .isEqualTo(JSONArray().apply { addAll(listOf("read")) })
   }
 }
