@@ -7,13 +7,11 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
-import java.time.Duration
 
 @Service
 class CommunityService(
@@ -65,12 +63,6 @@ class CommunityService(
       .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
       .onErrorResume(::failOnError)
   }
-
-  fun waitForTestToComplete(nomsNumber: String, bookingNumber: String): Flux<TestStatus> =
-    Flux.interval(Duration.ofMillis(testResultPollMs))
-      .take(Duration.ofSeconds(testMaxLengthSeconds))
-      .flatMap { checkCustodyTestComplete(nomsNumber, bookingNumber) }
-      .takeUntil(TestStatus::testComplete)
 
   fun checkCustodyTestComplete(nomsNumber: String, bookNumber: String): Mono<TestStatus> {
     fun testIncompleteOnNotFound(): Mono<out TestStatus> =
