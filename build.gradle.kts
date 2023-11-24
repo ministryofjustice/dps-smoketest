@@ -22,7 +22,7 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.3")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
   testImplementation("io.projectreactor:reactor-test:3.6.0")
-  testImplementation("org.wiremock:wiremock:3.3.1")
+  testImplementation("org.wiremock:wiremock-standalone:3.3.1")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.19") {
