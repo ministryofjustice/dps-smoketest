@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.9.0"
-  kotlin("plugin.spring") version "1.9.20"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.10.0"
+  kotlin("plugin.spring") version "1.9.21"
 }
 
 configurations {
@@ -22,10 +22,10 @@ dependencies {
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.3")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
   testImplementation("io.projectreactor:reactor-test:3.6.0")
-  testImplementation("org.wiremock:wiremock:3.3.1")
+  testImplementation("org.wiremock:wiremock-standalone:3.3.1")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.18") {
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.19") {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("io.swagger.core.v3:swagger-core-jakarta:2.2.19")
