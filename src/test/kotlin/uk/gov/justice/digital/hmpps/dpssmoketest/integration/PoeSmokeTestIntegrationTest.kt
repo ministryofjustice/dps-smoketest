@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.Test
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.INCOMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.SUCCESS
+import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
@@ -115,7 +116,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       hmppsEventQueue.sqsClient.sendMessage(
         SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build(),
       ).get()
-      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 1 }
+      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl).get() } matches { it == 1 }
     }
 
     @Test
@@ -142,11 +143,11 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       hmppsEventQueue.sqsClient.sendMessage(
         SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build(),
       ).get()
-      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 1 }
+      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl).get() } matches { it == 1 }
       hmppsEventQueue.sqsClient.sendMessage(
         SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerRecalled".loadJson()).build(),
       ).get()
-      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) } matches { it == 2 }
+      await untilCallTo { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl).get() } matches { it == 2 }
     }
 
     @Test

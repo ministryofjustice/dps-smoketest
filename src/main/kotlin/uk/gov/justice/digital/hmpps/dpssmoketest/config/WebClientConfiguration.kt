@@ -17,34 +17,27 @@ import kotlin.apply as kotlinApply
 
 @Configuration
 class WebClientConfiguration(
-  @Value("\${community.endpoint.url}") private val communityRootUri: String,
   @Value("\${prisonapi.endpoint.url}") private val prisonapiRootUri: String,
-  @Value("\${probationoffendersearch.endpoint.url}") private val probationOffenderSearchUri: String,
+  @Value("\${prisonersearch.endpoint.url}") private val prisonerSearchUri: String,
   @Value("\${api.timeout:10s}") val timeout: Duration,
 ) {
-
-  @Bean
-  fun communityApiWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
-    builder.authorisedWebClient(authorizedClientManager, registrationId = "community-api", url = communityRootUri, timeout)
-
   @Bean
   fun prisonApiWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
     builder.authorisedWebClient(authorizedClientManager, registrationId = "prison-api", url = prisonapiRootUri, timeout)
 
   @Bean
-  fun probationOffenderSearchWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
-    builder.authorisedWebClient(authorizedClientManager, registrationId = "probation-offender-search", url = probationOffenderSearchUri, timeout)
+  fun prisonerSearchWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient =
+    builder.authorisedWebClient(authorizedClientManager, registrationId = "prisoner-search", url = prisonerSearchUri, timeout)
 
   @Bean
   fun authorizedClientManager(
     clientRegistrationRepository: ClientRegistrationRepository,
     oAuth2AuthorizedClientService: OAuth2AuthorizedClientService,
-  ): OAuth2AuthorizedClientManager {
-    val authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
-    return AuthorizedClientServiceOAuth2AuthorizedClientManager(
+  ): OAuth2AuthorizedClientManager = OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build().let {
+    AuthorizedClientServiceOAuth2AuthorizedClientManager(
       clientRegistrationRepository,
       oAuth2AuthorizedClientService,
-    ).kotlinApply { setAuthorizedClientProvider(authorizedClientProvider) }
+    ).kotlinApply { setAuthorizedClientProvider(it) }
   }
 }
 

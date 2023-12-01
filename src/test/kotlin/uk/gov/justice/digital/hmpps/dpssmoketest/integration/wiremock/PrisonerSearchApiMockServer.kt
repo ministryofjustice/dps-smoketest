@@ -13,28 +13,28 @@ import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 
-class ProbationOffenderSearchExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class PrisonerSearchExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
   companion object {
     @JvmField
-    val probationOffenderSearch = ProbationOffenderSearchMockServer(
+    val prisonerSearch = PrisonerSearchMockServer(
       wireMockConfig().extensions(SearchBodyTransformer::class.java),
     )
   }
 
-  override fun beforeAll(context: ExtensionContext?) {
-    probationOffenderSearch.start()
+  override fun beforeAll(context: ExtensionContext) {
+    prisonerSearch.start()
   }
 
-  override fun beforeEach(context: ExtensionContext?) {
-    probationOffenderSearch.resetAll()
+  override fun beforeEach(context: ExtensionContext) {
+    prisonerSearch.resetAll()
   }
 
-  override fun afterAll(context: ExtensionContext?) {
-    probationOffenderSearch.stop()
+  override fun afterAll(context: ExtensionContext) {
+    prisonerSearch.stop()
   }
 }
 
-class ProbationOffenderSearchMockServer(config: WireMockConfiguration) : WireMockServer(config.port(WIREMOCK_PORT)) {
+class PrisonerSearchMockServer(config: WireMockConfiguration) : WireMockServer(config.port(WIREMOCK_PORT)) {
   companion object {
     private const val WIREMOCK_PORT = 8097
   }
@@ -52,11 +52,9 @@ class SearchBodyTransformer : ResponseDefinitionTransformerV2 {
           """
             [
              {
-                "otherIds": {
-                  "crn": "${requestBody.crn}"
-                },
+                "prisonerNumber": "${requestBody.prisonerIdentifier}",
                 "firstName": "${requestBody.firstName}",
-                "surname": "${requestBody.surname}"
+                "lastName": "${requestBody.lastName}"
              }
             ]
           """.trimIndent(),
@@ -65,13 +63,9 @@ class SearchBodyTransformer : ResponseDefinitionTransformerV2 {
     }
   }
 
-  override fun getName(): String {
-    return "search-body"
-  }
+  override fun getName(): String = "search-body"
 
-  override fun applyGlobally(): Boolean {
-    return false
-  }
+  override fun applyGlobally(): Boolean = false
 }
 
-private data class SearchRequest(val crn: String, val firstName: String, val surname: String)
+private data class SearchRequest(val prisonerIdentifier: String, val firstName: String, val lastName: String)

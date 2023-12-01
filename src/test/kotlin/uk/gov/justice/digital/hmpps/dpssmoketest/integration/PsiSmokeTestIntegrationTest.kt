@@ -15,8 +15,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
-import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.ProbationOffenderSearchExtension
+import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension.Companion.prisonApi
+import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonerSearchExtension.Companion.prisonerSearch
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
@@ -40,7 +40,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires valid authentication token`() {
       webTestClient.post()
-        .uri("/smoke-test/probation-search-indexer/PSI_T3")
+        .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .exchange()
         .expectStatus().isUnauthorized
@@ -49,7 +49,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires correct role`() {
       webTestClient.post()
-        .uri("/smoke-test/probation-search-indexer/PSI_T3")
+        .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf()))
         .exchange()
@@ -59,7 +59,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires valid test profile`() {
       val results = webTestClient.post()
-        .uri("/smoke-test/probation-search-indexer/NOT_A_TEST_PROFILE")
+        .uri("/smoke-test/prisoner-search-indexer/NOT_A_TEST_PROFILE")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
@@ -74,7 +74,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `succeeds with correct access and test profile`() {
       val results = webTestClient.post()
-        .uri("/smoke-test/probation-search-indexer/PSI_T3")
+        .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
@@ -99,7 +99,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNext(TestStatus("Offender we expected to exist X379864 was not found. Check the offender has not be deleted in Delius", FAIL))
+        .expectNext(TestStatus("Offender we expected to exist A7940DY was not found. Check the offender has not be deleted in NOMIS", FAIL))
         .verifyComplete()
     }
   }
@@ -118,9 +118,9 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender A7940DY exists and is good to go") }
         .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
-        .expectNextMatches { testResult -> testResult.description.contains("Update offender details test failed for X379864 failed due t") }
+        .expectNextMatches { testResult -> testResult.description.contains("Update offender details test failed for A7940DY failed due t") }
         .verifyComplete()
     }
   }
@@ -140,20 +140,20 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender A7940DY exists and is good to go") }
         .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
-        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for X379864") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for A7940DY") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
         .expectNextMatches { testResult ->
-          testResult.description.contains("Offender X379864 was never found") &&
+          testResult.description.contains("Offender A7940DY was never found") &&
             testResult.progress == FAIL
         }
         .verifyComplete()
@@ -175,16 +175,20 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender A7940DY exists and is good to go") }
         .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
-        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for X379864") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for A7940DY") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
         .expectNextMatches { testResult ->
-          testResult.description.contains("Offender X379864 found with name Meaty Bones") &&
-            testResult.progress == COMPLETE
-        }
-        .expectNextMatches { testResult ->
-          testResult.description.contains("The offender X379864 was not found with name") &&
+          testResult.description.contains("The offender A7940DY was not found with name") &&
             testResult.progress == FAIL
         }
         .verifyComplete()
@@ -206,27 +210,27 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNextMatches { testResult -> testResult.description.contains("Offender X379864 exists and is good to go") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender A7940DY exists and is good to go") }
         .expectNextMatches { testResult -> testResult.description.contains("Will update name to") }
-        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for X379864") }
-        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender X379864 to be found") }
+        .expectNextMatches { testResult -> testResult.description.contains("Offender details set for A7940DY") }
+        .expectNextMatches { testResult -> testResult.description.contains("Still waiting for offender A7940DY to be found") }
         .expectNextMatches { testResult ->
-          testResult.description.contains("Offender X379864 found") &&
+          testResult.description.contains("Offender A7940DY found") &&
             testResult.progress == COMPLETE
         }
         .expectNextMatches { testResult ->
-          testResult.description.contains("Test for offender X379864 finished successfully") &&
+          testResult.description.contains("Test for offender A7940DY finished successfully") &&
             testResult.progress == SUCCESS
         }
         .verifyComplete()
 
       // and data reverted back to PSI Smoketest
-      CommunityApiExtension.communityApi.verify(
-        postRequestedFor(urlEqualTo("/secure/smoketest/offenders/crn/X379864/details")).withRequestBody(
+      prisonApi.verify(
+        postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7940DY/details")).withRequestBody(
           equalToJson(
             """{
                 "firstName" : "PSI",
-                "surname": "Smoketest"
+                "lastName": "Smoketest"
             }
             """.trimMargin(),
           ),
@@ -236,11 +240,11 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     }
   }
 
-  private fun getLastRequest() = CommunityApiExtension.communityApi.serveEvents.requests.first()
+  private fun getLastRequest() = prisonApi.serveEvents.requests.first()
 
   private fun postStartTest(): FluxExchangeResult<TestStatus> =
     webTestClient.post()
-      .uri("/smoke-test/probation-search-indexer/PSI_T3")
+      .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
       .accept(TEXT_EVENT_STREAM)
       .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
       .exchange()
@@ -249,21 +253,21 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 }
 
 private fun stubCheckOffenderExists(status: Int = HTTP_OK) =
-  CommunityApiExtension.communityApi.stubFor(
-    WireMock.get(WireMock.anyUrl()).willReturn(
+  prisonerSearch.stubFor(
+    WireMock.get(WireMock.urlPathMatching("/prisoner/[A-Z0-9]*")).willReturn(
       WireMock.aResponse()
         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .withStatus(status)
         .withBody(
           """
-            { "firstName": "Jane", "surname": "Smith" }
+            { "firstName": "Jane", "lastName": "Smith", "prisonerNumber": "A7940DY" }
           """.trimIndent(),
         ),
     ),
   )
 
 private fun stubChangeOffenderName(status: Int = HTTP_OK) =
-  CommunityApiExtension.communityApi.stubFor(
+  prisonApi.stubFor(
     WireMock.post(WireMock.anyUrl()).willReturn(
       WireMock.aResponse()
         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -272,7 +276,7 @@ private fun stubChangeOffenderName(status: Int = HTTP_OK) =
   )
 
 private fun stubTestNeverCompletes() {
-  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+  prisonerSearch.stubFor(
     WireMock.post(WireMock.anyUrl()).willReturn(
       WireMock.aResponse()
         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -287,7 +291,7 @@ private fun stubTestNeverCompletes() {
 }
 
 private fun stubTestWillCompleteSuccessfully() {
-  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+  prisonerSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
       .inScenario("My Scenario")
       .whenScenarioStateIs(Scenario.STARTED)
@@ -303,7 +307,7 @@ private fun stubTestWillCompleteSuccessfully() {
       )
       .willSetStateTo("Found"),
   )
-  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+  prisonerSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
       .inScenario("My Scenario")
       .whenScenarioStateIs("Found")
@@ -318,7 +322,7 @@ private fun stubTestWillCompleteSuccessfully() {
 }
 
 private fun stubTestCompletesWithNonMatch() {
-  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+  prisonerSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
       .inScenario("My Scenario")
       .whenScenarioStateIs(Scenario.STARTED)
@@ -334,7 +338,7 @@ private fun stubTestCompletesWithNonMatch() {
       )
       .willSetStateTo("Found"),
   )
-  ProbationOffenderSearchExtension.probationOffenderSearch.stubFor(
+  prisonerSearch.stubFor(
     WireMock.post(WireMock.anyUrl())
       .inScenario("My Scenario")
       .whenScenarioStateIs("Found")
@@ -346,11 +350,9 @@ private fun stubTestCompletesWithNonMatch() {
             """
             [
              {
-                "otherIds": {
-                  "crn": "X12345"
-                },
+                "prisonerNumber": "A7940DY",
                 "firstName": "Meaty",
-                "surname": "Bones"
+                "lastName": "Bones"
              }
             ]
             """.trimIndent(),

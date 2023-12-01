@@ -5,10 +5,7 @@ oauth:
 prisonapi:
   endpoint.url: http://localhost:8093
 
-community:
-  endpoint.url: http://localhost:8096
-
-probationoffendersearch:
+prisonersearch:
   endpoint.url: http://localhost:8097
 
 test:
