@@ -6,7 +6,7 @@ prisonapi:
   endpoint.url: http://localhost:8093
 
 prisonersearch:
-  endpoint.url: http://localhost:8097
+  endpoint.url: http://localhost:8091
 
 test:
   maxLengthSeconds: 10
@@ -15,7 +15,7 @@ test:
 smoketest:
   client:
     client-id: smoke-test-client
-    client-secret: password123456
+    client-secret: clientsecret
 
 server:
   shutdown: immediate

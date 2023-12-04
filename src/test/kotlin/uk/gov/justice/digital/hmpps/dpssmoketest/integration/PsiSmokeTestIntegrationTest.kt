@@ -283,7 +283,7 @@ private fun stubTestNeverCompletes() {
         .withStatus(HTTP_OK)
         .withBody(
           """
-            []
+            { "content": [] }
           """.trimIndent(),
         ),
     ),
@@ -301,7 +301,7 @@ private fun stubTestWillCompleteSuccessfully() {
           .withStatus(HTTP_OK)
           .withBody(
             """
-            []
+            { "content": [] }
             """.trimIndent(),
           ),
       )
@@ -332,7 +332,9 @@ private fun stubTestCompletesWithNonMatch() {
           .withStatus(HTTP_OK)
           .withBody(
             """
-            []
+              {
+                "content": []
+              }
             """.trimIndent(),
           ),
       )
@@ -348,13 +350,15 @@ private fun stubTestCompletesWithNonMatch() {
           .withStatus(HTTP_OK)
           .withBody(
             """
-            [
-             {
-                "prisonerNumber": "A7940DY",
-                "firstName": "Meaty",
-                "lastName": "Bones"
-             }
-            ]
+              {
+                "content": [
+                  {
+                    "prisonerNumber": "A7940DY",
+                    "firstName": "Meaty",
+                    "lastName": "Bones"
+                  }
+                ]
+              }
             """.trimIndent(),
           ),
 

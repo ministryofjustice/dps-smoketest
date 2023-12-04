@@ -50,13 +50,15 @@ class SearchBodyTransformer : ResponseDefinitionTransformerV2 {
         .withStatus(responseDefinition.status)
         .withBody(
           """
-            [
-             {
-                "prisonerNumber": "${requestBody.prisonerIdentifier}",
-                "firstName": "${requestBody.firstName}",
-                "lastName": "${requestBody.lastName}"
-             }
-            ]
+            {
+              "content": [
+                {
+                  "prisonerNumber": "${requestBody.prisonerIdentifier}",
+                  "firstName": "${requestBody.firstName}",
+                  "lastName": "${requestBody.lastName}"
+                }
+              ]
+            }
           """.trimIndent(),
         )
         .build()

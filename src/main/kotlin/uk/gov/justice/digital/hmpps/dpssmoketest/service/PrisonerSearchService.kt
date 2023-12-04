@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyInserters
@@ -104,7 +103,7 @@ class PrisonerSearchService(
       .contentType(MediaType.APPLICATION_JSON)
       .body(searchByNumberNameBody(nomsNumber, firstName, lastName))
       .retrieve()
-      .bodyToMono(object : ParameterizedTypeReference<List<OffenderDetails>>() {})
+      .bodyToMono(SearchResults::class.java).map { it.content }
 
   private fun searchByNumberNameBody(
     prisonerNumber: String,
@@ -120,5 +119,7 @@ class PrisonerSearchService(
     """.trimIndent(),
   )
 }
+
+private data class SearchResults(val content: List<OffenderDetails>)
 
 private data class OffenderDetails(val firstName: String, val lastName: String, val prisonerNumber: String)
