@@ -9,14 +9,10 @@ import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
-import software.amazon.awssdk.services.sqs.SqsAsyncClient
-import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest
-import software.amazon.awssdk.services.sqs.model.QueueAttributeName
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
-import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.CommunityApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.OAuthExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.ProbationOffenderSearchExtension
+import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonerSearchExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.service.QueueService
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -25,9 +21,8 @@ import uk.gov.justice.hmpps.sqs.HmppsQueueService
 @ActiveProfiles("test")
 @ExtendWith(
   OAuthExtension::class,
-  CommunityApiExtension::class,
   PrisonApiExtension::class,
-  ProbationOffenderSearchExtension::class,
+  PrisonerSearchExtension::class,
 )
 abstract class IntegrationTestBase {
 
@@ -37,7 +32,6 @@ abstract class IntegrationTestBase {
   @SpyBean
   protected lateinit var queueService: QueueService
 
-  @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   lateinit var webTestClient: WebTestClient
 
@@ -54,7 +48,3 @@ abstract class IntegrationTestBase {
   internal val hmppsEventQueueName by lazy { hmppsEventQueue.queueName }
   internal val hmppsEventQueueSqsClient by lazy { hmppsEventQueue.sqsClient }
 }
-
-internal fun SqsAsyncClient.countMessagesOnQueue(queueUrl: String): Int =
-  this.getQueueAttributes(GetQueueAttributesRequest.builder().queueUrl(queueUrl).attributeNames(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES).build())
-    .let { it.get().attributes()[QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES]?.toInt() ?: 0 }

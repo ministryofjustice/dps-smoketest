@@ -5,11 +5,8 @@ oauth:
 prisonapi:
   endpoint.url: http://localhost:8093
 
-community:
-  endpoint.url: http://localhost:8096
-
-probationoffendersearch:
-  endpoint.url: http://localhost:8097
+prisonersearch:
+  endpoint.url: http://localhost:8091
 
 test:
   maxLengthSeconds: 10
@@ -18,7 +15,7 @@ test:
 smoketest:
   client:
     client-id: smoke-test-client
-    client-secret: password123456
+    client-secret: clientsecret
 
 server:
   shutdown: immediate

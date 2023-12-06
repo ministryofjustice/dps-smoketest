@@ -1,10 +1,11 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
-// Probation search indexer
-data class PsiTestParameters(val crn: String)
+// Prisoner search indexer
+data class PsiTestParameters(val nomsNumber: String)
 
 enum class PsiTestProfiles(val profile: PsiTestParameters) {
-  PSI_T3(PsiTestParameters("X379864")),
+  PSI_T3(PsiTestParameters("A7940DY")),
+  PSI_LOCAL(PsiTestParameters("A1183SH")),
 }
 
 // Prison offender events
