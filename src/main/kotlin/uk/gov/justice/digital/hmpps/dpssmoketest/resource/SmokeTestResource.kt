@@ -64,8 +64,11 @@ class SmokeTestResource(
     @PathVariable(value = "testProfile")
     testProfile: String,
   ): Flux<TestStatus> = runCatching { PsiTestProfiles.valueOf(testProfile).profile }
-    .map { profile -> psiSmokeTestService.runSmokeTest(profile).doOnComplete { psiSmokeTestService.cleanup(profile).share().block() } }
-    .getOrDefault(Flux.just(TestStatus("Unknown test profile $testProfile", FAIL)))
+    .map { profile ->
+      psiSmokeTestService.runSmokeTest(profile).concatMap {
+        psiSmokeTestService.cleanup(profile).thenReturn(it)
+      }
+    }.getOrDefault(Flux.just(TestStatus("Unknown test profile $testProfile", FAIL)))
 
   @PostMapping("/smoke-test/prison-offender-events/{testProfile}", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
   @PreAuthorize("hasRole('SMOKE_TEST')")
