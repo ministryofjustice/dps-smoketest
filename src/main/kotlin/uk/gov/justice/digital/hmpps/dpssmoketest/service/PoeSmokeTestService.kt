@@ -18,17 +18,15 @@ class PoeSmokeTestService(
 
     return Flux.concat(
       Flux.just(TestStatus("Will release prisoner ${testProfile.nomsNumber}", INCOMPLETE)),
-      Flux.from(prisonService.triggerPoeReleaseTest(testProfile.nomsNumber)),
-      Flux.from(
-        queueService.waitForEventToBeProduced(
-          "prison-offender-events.prisoner.released",
-          testProfile.nomsNumber,
-          COMPLETE,
-        ),
+      prisonService.triggerPoeReleaseTest(testProfile.nomsNumber),
+      queueService.waitForEventToBeProduced(
+        "prison-offender-events.prisoner.released",
+        testProfile.nomsNumber,
+        COMPLETE,
       ),
       Flux.just(TestStatus("Will recall prisoner ${testProfile.nomsNumber}", INCOMPLETE)),
-      Flux.from(prisonService.triggerPoeRecallTest(testProfile.nomsNumber)),
-      Flux.from(queueService.waitForEventToBeProduced("prison-offender-events.prisoner.received", testProfile.nomsNumber, SUCCESS)),
+      prisonService.triggerPoeRecallTest(testProfile.nomsNumber),
+      queueService.waitForEventToBeProduced("prison-offender-events.prisoner.received", testProfile.nomsNumber, SUCCESS),
     ).takeUntil(TestStatus::hasResult)
   }
 }

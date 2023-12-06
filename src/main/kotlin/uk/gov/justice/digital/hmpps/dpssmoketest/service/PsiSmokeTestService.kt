@@ -15,11 +15,11 @@ class PsiSmokeTestService(
   fun runSmokeTest(testProfile: PsiTestParameters): Flux<TestStatus> =
     generateRandomNames().let { (firstName, lastName) ->
       Flux.concat(
-        Flux.from(prisonerSearchService.checkOffenderExists(testProfile.nomsNumber)),
+        prisonerSearchService.checkOffenderExists(testProfile.nomsNumber),
         Flux.just(TestStatus("Will update name to $firstName $lastName")),
-        Flux.from(prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, firstName, lastName)),
+        prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, firstName, lastName),
         prisonerSearchService.waitForOffenderToBeFound(testProfile.nomsNumber, firstName, lastName),
-        Flux.from(prisonerSearchService.assertTestResult(testProfile.nomsNumber, firstName, lastName)),
+        prisonerSearchService.assertTestResult(testProfile.nomsNumber, firstName, lastName),
       ).takeUntil(TestStatus::hasResult)
     }
 
