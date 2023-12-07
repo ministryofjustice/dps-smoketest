@@ -5,6 +5,7 @@ data class PsiTestParameters(val nomsNumber: String)
 
 enum class PsiTestProfiles(val profile: PsiTestParameters) {
   PSI_T3(PsiTestParameters("A7940DY")),
+  PS_T3(PsiTestParameters("A8010DY")),
   PSI_LOCAL(PsiTestParameters("A1183SH")),
 }
 

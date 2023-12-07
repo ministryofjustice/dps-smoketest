@@ -41,7 +41,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires valid authentication token`() {
       webTestClient.post()
-        .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
+        .uri("/smoke-test/prisoner-search/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .exchange()
         .expectStatus().isUnauthorized
@@ -50,7 +50,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires correct role`() {
       webTestClient.post()
-        .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
+        .uri("/smoke-test/prisoner-search/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf()))
         .exchange()
@@ -60,7 +60,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `requires valid test profile`() {
       val results = webTestClient.post()
-        .uri("/smoke-test/prisoner-search-indexer/NOT_A_TEST_PROFILE")
+        .uri("/smoke-test/prisoner-search/NOT_A_TEST_PROFILE")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
@@ -75,7 +75,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
     @Test
     fun `succeeds with correct access and test profile`() {
       val results = webTestClient.post()
-        .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
+        .uri("/smoke-test/prisoner-search/PSI_T3")
         .accept(TEXT_EVENT_STREAM)
         .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
         .exchange()
@@ -250,7 +250,7 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
   private fun postStartTest(): FluxExchangeResult<TestStatus> =
     webTestClient.post()
-      .uri("/smoke-test/prisoner-search-indexer/PSI_T3")
+      .uri("/smoke-test/prisoner-search/PSI_T3")
       .accept(TEXT_EVENT_STREAM)
       .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
       .exchange()
