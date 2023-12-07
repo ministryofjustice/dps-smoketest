@@ -66,7 +66,7 @@ class SmokeTestResource(
   ): Flux<TestStatus> = runCatching { PsiTestProfiles.valueOf(testProfile).profile }
     .map { profile ->
       psiSmokeTestService.runSmokeTest(profile).concatMap {
-        psiSmokeTestService.cleanup(profile).thenReturn(it)
+        if (it.hasResult()) psiSmokeTestService.cleanup(profile).thenReturn(it) else Flux.just(it)
       }
     }.getOrDefault(Flux.just(TestStatus("Unknown test profile $testProfile", FAIL)))
 
