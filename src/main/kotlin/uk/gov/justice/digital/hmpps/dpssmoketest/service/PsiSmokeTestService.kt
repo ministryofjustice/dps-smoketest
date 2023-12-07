@@ -24,12 +24,12 @@ class PsiSmokeTestService(
     }
 
   fun cleanup(testProfile: PsiTestParameters): Mono<TestStatus> =
-    prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, "PSI", "Smoketest")
+    prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, "PSI", "SMOKETEST")
 }
-private fun generateRandomNames(): Pair<String, String> = randomString() to randomString()
+private fun generateRandomNames(): Pair<String, String> = randomUpperString() to randomUpperString()
 
-private fun randomString(): String {
-  val charPool: List<Char> = ('a'..'z') + ('A'..'Z')
+private fun randomUpperString(): String {
+  val charPool: List<Char> = ('A'..'Z').toList()
 
   return (1..10)
     .map { nextInt(0, charPool.size) }

@@ -231,13 +231,13 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
           equalToJson(
             """{
                 "firstName" : "PSI",
-                "lastName": "Smoketest"
+                "lastName": "SMOKETEST"
             }
             """.trimMargin(),
           ),
         ),
       )
-      assertThat(getLastRequest().request.bodyAsString).contains("PSI").contains("Smoketest")
+      assertThat(getLastRequest().request.bodyAsString).contains("PSI").contains("SMOKETEST")
 
       // one to update details and one to set back again
       prisonApi.verify(2, postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7940DY/details")))
