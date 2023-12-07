@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
+import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.stubbing.Scenario
@@ -237,6 +238,11 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
         ),
       )
       assertThat(getLastRequest().request.bodyAsString).contains("PSI").contains("Smoketest")
+
+      // one to update details and one to set back again
+      prisonApi.verify(2, postRequestedFor(urlEqualTo("/api/smoketest/offenders/A7940DY/details")))
+      prisonerSearch.verify(1, getRequestedFor(urlEqualTo("/prisoner/A7940DY")))
+      prisonerSearch.verify(3, postRequestedFor(urlEqualTo("/global-search")))
     }
   }
 
