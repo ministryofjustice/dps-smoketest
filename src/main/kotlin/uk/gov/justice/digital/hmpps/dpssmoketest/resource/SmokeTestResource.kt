@@ -121,7 +121,10 @@ class SmokeTestResource(
 
     @Schema(description = "The current progress of a test")
     enum class TestProgress {
-      INCOMPLETE, COMPLETE, SUCCESS, FAIL;
+      INCOMPLETE,
+      COMPLETE,
+      SUCCESS,
+      FAIL,
     }
   }
 }

@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.13.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.14.1"
   kotlin("plugin.spring") version "1.9.22"
 }
 
@@ -21,7 +21,7 @@ dependencies {
 
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.3")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
-  testImplementation("io.projectreactor:reactor-test:3.6.1")
+  testImplementation("io.projectreactor:reactor-test:3.6.2")
   testImplementation("org.wiremock:wiremock-standalone:3.3.1")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.10.1")
