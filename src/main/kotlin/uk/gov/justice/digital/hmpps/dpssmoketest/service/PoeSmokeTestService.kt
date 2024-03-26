@@ -17,6 +17,7 @@ class PoeSmokeTestService(
     queueService.purgeQueue()
 
     return Flux.concat(
+      prisonService.configurePrisonerStatus(testProfile.nomsNumber),
       Flux.just(TestStatus("Will release prisoner ${testProfile.nomsNumber}", INCOMPLETE)),
       prisonService.triggerPoeReleaseTest(testProfile.nomsNumber),
       queueService.waitForEventToBeProduced(

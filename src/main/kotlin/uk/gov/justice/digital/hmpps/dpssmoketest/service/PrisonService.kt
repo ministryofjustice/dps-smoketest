@@ -5,7 +5,6 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.WebClientResponseException.NotFound
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
@@ -27,7 +26,7 @@ class PrisonService(
       .retrieve()
       .toBodilessEntity()
       .map { TestStatus("Triggered test for $nomsNumber") }
-      .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
+      .onErrorResume(NotFound::class.java) { failOnNotFound() }
       .onErrorResume(::failOnError)
   }
 
@@ -43,9 +42,36 @@ class PrisonService(
       .retrieve()
       .toBodilessEntity()
       .map { TestStatus("Triggered test for $nomsNumber") }
-      .onErrorResume(WebClientResponseException.NotFound::class.java) { failOnNotFound() }
+      .onErrorResume(NotFound::class.java) { failOnNotFound() }
       .onErrorResume(::failOnError)
   }
+
+  fun configurePrisonerStatus(nomsNumber: String): Mono<TestStatus> {
+    fun failOnError(exception: Throwable): Mono<out TestStatus> =
+      Mono.just(
+        TestStatus(
+          "Offender we expected to exist $nomsNumber failed due to  ${exception.message}",
+          FAIL,
+        ),
+      )
+
+    fun failOnNotFound(): Mono<out TestStatus> =
+      Mono.just(
+        TestStatus(
+          "Offender we expected to exist $nomsNumber was not found. Check the offender has not be deleted in NOMIS",
+          FAIL,
+        ),
+      )
+    return webClient.put()
+      .uri("/api/smoketest/offenders/{nomsNumber}/status", nomsNumber)
+      .retrieve()
+      .bodyToMono(OffenderStatus::class.java)
+      .map { TestStatus("Offender $nomsNumber exists and has correct status") }
+      .onErrorResume(NotFound::class.java) { failOnNotFound() }
+      .onErrorResume(::failOnError)
+  }
+
+  private data class OffenderStatus(val inOutStatus: String)
 
   fun setOffenderDetailsTestData(nomsNumber: String, firstName: String, lastName: String): Mono<TestStatus> {
     fun failOnNotFound(): Mono<out TestStatus> =

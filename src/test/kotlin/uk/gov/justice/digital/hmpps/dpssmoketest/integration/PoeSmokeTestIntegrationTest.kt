@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
@@ -92,6 +94,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     @BeforeEach
     internal fun setUp() {
       stubTriggerTest(HTTP_NOT_FOUND)
+      stubPrisonerStatus()
     }
 
     @Test
@@ -111,6 +114,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     @BeforeEach
     internal fun setUp() {
       stubReleaseTriggerTest(HTTP_OK)
+      stubPrisonerStatus()
       stubRecallTriggerTest(HTTP_NOT_FOUND)
       doNothing().whenever(queueService).purgeQueue()
       hmppsEventQueue.sqsClient.sendMessage(
@@ -134,11 +138,29 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
   }
 
   @Nested
+  @DisplayName("When trigger test fails for prisoner status")
+  inner class WhenTriggerFailsForPrisonerStatus {
+    @BeforeEach
+    internal fun setUp() {
+      stubPrisonerStatus(status = HTTP_NOT_FOUND)
+    }
+
+    @Test
+    fun `status reflects error`() {
+      val results = postStartTest()
+      StepVerifier.create(results.responseBody)
+        .expectNext(TestStatus("Offender we expected to exist A7851DY was not found. Check the offender has not be deleted in NOMIS", FAIL))
+        .verifyComplete()
+    }
+  }
+
+  @Nested
   @DisplayName("When test succeeds")
   inner class TestSucceeds {
     @BeforeEach
     internal fun setUp() {
       stubTriggerTest()
+      stubPrisonerStatus()
       doNothing().whenever(queueService).purgeQueue()
       hmppsEventQueue.sqsClient.sendMessage(
         SendMessageRequest.builder().queueUrl(hmppsEventQueueUrl).messageBody("/messages/prisonerReleased".loadJson()).build(),
@@ -201,3 +223,12 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 private fun String.loadJson(): String {
   return PoeSmokeTestIntegrationTest::class.java.getResource("$this.json").readText()
 }
+
+private fun stubPrisonerStatus(offenderNo: String = "A7851DY", status: Int = HTTP_OK) =
+  PrisonApiExtension.prisonApi.stubFor(
+    WireMock.put(WireMock.urlPathMatching("/api/smoketest/offenders/$offenderNo/status")).willReturn(
+      WireMock.aResponse()
+        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .withStatus(status),
+    ),
+  )
