@@ -30,7 +30,7 @@ import java.net.HttpURLConnection.HTTP_OK
 
 class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
-  val poeoffenderNo = PoeTestProfiles.POE_T3.profile.nomsNumber
+  val poeOffenderNo = PoeTestProfiles.POE_T3.profile.nomsNumber
 
   @Nested
   @DisplayName("Poe API tests")
@@ -104,8 +104,8 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     fun `status reflects error`() {
       val results = postStartTest()
       StepVerifier.create(results.responseBody)
-        .expectNext(TestStatus("Will release prisoner $poeoffenderNo", INCOMPLETE))
-        .expectNext(TestStatus("Trigger test failed. The offender $poeoffenderNo can not be found", FAIL))
+        .expectNext(TestStatus("Will release prisoner $poeOffenderNo", INCOMPLETE))
+        .expectNext(TestStatus("Trigger test failed. The offender $poeOffenderNo can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -130,11 +130,11 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNext(TestStatus("Will release prisoner $poeoffenderNo", INCOMPLETE))
-        .expectNext(TestStatus("Triggered test for $poeoffenderNo"))
-        .expectNext(TestStatus("Test for offender $poeoffenderNo prison-offender-events.prisoner.released event finished successfully", COMPLETE))
-        .expectNext(TestStatus("Will recall prisoner $poeoffenderNo", INCOMPLETE))
-        .expectNext(TestStatus("Trigger test failed. The offender $poeoffenderNo can not be found", FAIL))
+        .expectNext(TestStatus("Will release prisoner $poeOffenderNo", INCOMPLETE))
+        .expectNext(TestStatus("Triggered test for $poeOffenderNo"))
+        .expectNext(TestStatus("Test for offender $poeOffenderNo prison-offender-events.prisoner.released event finished successfully", COMPLETE))
+        .expectNext(TestStatus("Will recall prisoner $poeOffenderNo", INCOMPLETE))
+        .expectNext(TestStatus("Trigger test failed. The offender $poeOffenderNo can not be found", FAIL))
         .verifyComplete()
     }
   }
@@ -151,7 +151,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     fun `status reflects error`() {
       val results = postStartTest()
       StepVerifier.create(results.responseBody)
-        .expectNext(TestStatus("Offender we expected to exist $poeoffenderNo was not found. Check the offender has not be deleted in NOMIS", FAIL))
+        .expectNext(TestStatus("Offender we expected to exist $poeOffenderNo was not found. Check the offender has not be deleted in NOMIS", FAIL))
         .verifyComplete()
     }
   }
@@ -179,12 +179,12 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = postStartTest()
 
       StepVerifier.create(results.responseBody)
-        .expectNext(TestStatus("Will release prisoner $poeoffenderNo", INCOMPLETE))
-        .expectNext(TestStatus("Triggered test for $poeoffenderNo"))
-        .expectNext(TestStatus("Test for offender $poeoffenderNo prison-offender-events.prisoner.released event finished successfully", COMPLETE))
-        .expectNext(TestStatus("Will recall prisoner $poeoffenderNo", INCOMPLETE))
-        .expectNext(TestStatus("Triggered test for $poeoffenderNo"))
-        .expectNext(TestStatus("Test for offender $poeoffenderNo prison-offender-events.prisoner.received event finished successfully", SUCCESS))
+        .expectNext(TestStatus("Will release prisoner $poeOffenderNo", INCOMPLETE))
+        .expectNext(TestStatus("Triggered test for $poeOffenderNo"))
+        .expectNext(TestStatus("Test for offender $poeOffenderNo prison-offender-events.prisoner.released event finished successfully", COMPLETE))
+        .expectNext(TestStatus("Will recall prisoner $poeOffenderNo", INCOMPLETE))
+        .expectNext(TestStatus("Triggered test for $poeOffenderNo"))
+        .expectNext(TestStatus("Test for offender $poeOffenderNo prison-offender-events.prisoner.received event finished successfully", SUCCESS))
         .verifyComplete()
     }
   }
@@ -208,14 +208,14 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
   private fun stubReleaseTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
-      WireMock.put("/api/smoketest/offenders/$poeoffenderNo/release").willReturn(
+      WireMock.put("/api/smoketest/offenders/$poeOffenderNo/release").willReturn(
         WireMock.aResponse()
           .withStatus(status),
       ),
     )
   private fun stubRecallTriggerTest(status: Int = HTTP_OK) =
     PrisonApiExtension.prisonApi.stubFor(
-      WireMock.put("/api/smoketest/offenders/$poeoffenderNo/recall").willReturn(
+      WireMock.put("/api/smoketest/offenders/$poeOffenderNo/recall").willReturn(
         WireMock.aResponse()
           .withStatus(status),
       ),
