@@ -13,5 +13,5 @@ enum class PsiTestProfiles(val profile: PsiTestParameters) {
 data class PoeTestParameters(val nomsNumber: String)
 
 enum class PoeTestProfiles(val profile: PoeTestParameters) {
-  POE_T3(PoeTestParameters("A7851DY")),
+  POE_T3(PoeTestParameters("A1145EA")),
 }
