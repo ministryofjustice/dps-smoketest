@@ -23,5 +23,5 @@ generic-service:
 generic-prometheus-alerts:
   businessHoursOnly: true
   alertSeverity: syscon-nonprod
-  sqsAlertsQueueNames:
+  sqsNumberAlertQueueNames:
     - "Digital-Prison-Services-prod-dps_smoketest_dev_hmpps_queue"
