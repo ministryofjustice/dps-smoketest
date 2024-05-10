@@ -42,4 +42,4 @@ generic-service:
 generic-prometheus-alerts:
   targetApplication: dps-smoketest
   alertSeverity: syscon
-  sqsAlertsTotalMessagesThreshold: 1
+  sqsAlertsTotalMessagesThreshold: 50
