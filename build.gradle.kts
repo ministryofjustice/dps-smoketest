@@ -1,6 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.6"
-  kotlin("plugin.spring") version "1.9.23"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.0"
+  kotlin("plugin.spring") version "2.0.0"
 }
 
 configurations {
@@ -17,14 +17,14 @@ dependencies {
 
   testImplementation("io.jsonwebtoken:jjwt-impl:0.12.5")
   testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
-  testImplementation("io.projectreactor:reactor-test:3.6.5")
-  testImplementation("org.wiremock:wiremock-standalone:3.5.4")
+  testImplementation("io.projectreactor:reactor-test:3.6.6")
+  testImplementation("org.wiremock:wiremock-standalone:3.6.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
-  testImplementation("com.google.code.gson:gson:2.10.1")
+  testImplementation("com.google.code.gson:gson:2.11.0")
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.22") {
     exclude(group = "io.swagger.core.v3")
   }
-  testImplementation("io.swagger.core.v3:swagger-core-jakarta:2.2.21")
+  testImplementation("io.swagger.core.v3:swagger-core-jakarta:2.2.22")
 }
 
 kotlin {
@@ -33,8 +33,6 @@ kotlin {
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = "21"
-    }
+    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
   }
 }
