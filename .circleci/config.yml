@@ -76,6 +76,7 @@ workflows:
           context:
             - hmpps-common-vars
       - hmpps/veracode_pipeline_scan:
+          jdk_tag: "21.0"
           slack_channel: hmpps_tech_alerts_security
           context:
             - veracode-credentials
@@ -90,6 +91,7 @@ workflows:
                 - main
     jobs:
       - hmpps/veracode_policy_scan:
+          jdk_tag: "21.0"
           slack_channel: hmpps_tech_alerts_security
           context:
             - veracode-credentials
