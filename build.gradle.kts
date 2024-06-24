@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.0.1"
   kotlin("plugin.spring") version "2.0.0"
 }
 
@@ -9,16 +9,16 @@ configurations {
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.0")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.0.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:4.0.1")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
   implementation("org.awaitility:awaitility-kotlin:4.2.1")
 
-  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.5")
-  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
+  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
+  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
   testImplementation("io.projectreactor:reactor-test:3.6.6")
-  testImplementation("org.wiremock:wiremock-standalone:3.6.0")
+  testImplementation("org.wiremock:wiremock-standalone:3.7.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.11.0")
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.22") {
