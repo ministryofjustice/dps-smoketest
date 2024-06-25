@@ -17,10 +17,10 @@ import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import uk.gov.justice.digital.hmpps.dpssmoketest.helper.JwtAuthHelper
 import uk.gov.justice.digital.hmpps.dpssmoketest.helper.findLogAppender
+import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
 
-@Import(JwtAuthHelper::class, ClientTrackingInterceptor::class, ClientTrackingConfiguration::class)
+@Import(JwtAuthorisationHelper::class, ClientTrackingInterceptor::class, ClientTrackingConfiguration::class)
 @ContextConfiguration(initializers = [ConfigDataApplicationContextInitializer::class])
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension::class)
@@ -31,7 +31,7 @@ class ClientTrackingConfigurationTest {
 
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
-  private lateinit var jwtAuthHelper: JwtAuthHelper
+  private lateinit var jwtAuthHelper: JwtAuthorisationHelper
 
   private val req = MockHttpServletRequest()
   private val res = MockHttpServletResponse()
@@ -40,7 +40,7 @@ class ClientTrackingConfigurationTest {
 
   @Test
   fun shouldAddClientIdAndUserNameToInsightTelemetry() {
-    val token = jwtAuthHelper.createJwt("bob")
+    val token = jwtAuthHelper.createJwtAccessToken(username = "bob", clientId = "dps-smoketest-client")
     req.addHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
     tracer.spanBuilder("span").startSpan().run {
       makeCurrent().use { clientTrackingInterceptor.preHandle(req, res, "null") }
@@ -56,7 +56,7 @@ class ClientTrackingConfigurationTest {
 
   @Test
   fun shouldAddOnlyClientIdIfUsernameNullToInsightTelemetry() {
-    val token = jwtAuthHelper.createJwt(null)
+    val token = jwtAuthHelper.createJwtAccessToken(username = null, clientId = "dps-smoketest-client")
     req.addHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
     val res = MockHttpServletResponse()
     tracer.spanBuilder("span").startSpan().run {
