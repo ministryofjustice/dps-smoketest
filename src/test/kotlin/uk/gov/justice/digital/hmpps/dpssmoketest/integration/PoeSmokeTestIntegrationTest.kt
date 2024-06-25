@@ -55,7 +55,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       webTestClient.post()
         .uri("/smoke-test/prison-offender-events/POE_T3")
         .accept(TEXT_EVENT_STREAM)
-        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf()))
+        .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test"))
         .exchange()
         .expectStatus().isForbidden
     }
@@ -65,7 +65,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = webTestClient.post()
         .uri("/smoke-test/prison-offender-events/NOT_A_TEST_PROFILE")
         .accept(TEXT_EVENT_STREAM)
-        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+        .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
         .exchange()
         .expectStatus().isOk
         .returnResult(TestStatus::class.java)
@@ -81,7 +81,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
       val results = webTestClient.post()
         .uri("/smoke-test/prison-offender-events/POE_T3")
         .accept(TEXT_EVENT_STREAM)
-        .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+        .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
         .exchange()
         .expectStatus().isOk
         .returnResult(String::class.java)
@@ -193,7 +193,7 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     webTestClient.post()
       .uri("/smoke-test/prison-offender-events/POE_T3")
       .accept(TEXT_EVENT_STREAM)
-      .headers(jwtAuthHelper.setAuthorisation("dps-smoke-test", listOf("ROLE_SMOKE_TEST")))
+      .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
       .exchange()
       .expectStatus().isOk
       .returnResult(TestStatus::class.java)

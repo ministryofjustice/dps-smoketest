@@ -15,8 +15,7 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
   implementation("org.awaitility:awaitility-kotlin:4.2.1")
 
-  testImplementation("io.jsonwebtoken:jjwt-impl:0.12.6")
-  testImplementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.0.2-beta")
   testImplementation("io.projectreactor:reactor-test:3.6.6")
   testImplementation("org.wiremock:wiremock-standalone:3.7.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
