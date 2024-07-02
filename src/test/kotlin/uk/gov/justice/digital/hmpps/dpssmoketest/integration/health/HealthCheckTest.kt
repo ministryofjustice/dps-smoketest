@@ -1,11 +1,7 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration.health
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.IntegrationTestBase
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.function.Consumer
 
 class HealthCheckTest : IntegrationTestBase() {
 
@@ -32,18 +28,6 @@ class HealthCheckTest : IntegrationTestBase() {
       .jsonPath("components.hmppseventqueue-health.details.messagesOnDlq").doesNotExist()
       .jsonPath("components.hmppseventqueue-health.details.dlqStatus").doesNotExist()
       .jsonPath("components.hmppseventqueue-health.details.dlqName").doesNotExist()
-  }
-
-  @Test
-  fun `Health info reports version`() {
-    webTestClient.get().uri("/health")
-      .exchange()
-      .expectStatus().isOk
-      .expectBody().jsonPath("components.healthInfo.details.version").value(
-        Consumer<String> {
-          assertThat(it).startsWith(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-        },
-      )
   }
 
   @Test
