@@ -17,8 +17,6 @@ generic-service:
     PRISONERSEARCH_ENDPOINT_URL: "https://prisoner-search-dev.prison.service.justice.gov.uk"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
-  allowlist: null
-
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 generic-prometheus-alerts:
   businessHoursOnly: true
