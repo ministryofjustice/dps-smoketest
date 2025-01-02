@@ -1,5 +1,3 @@
-# Values here are the same across all environments
-
 generic-service:
   nameOverride: dps-smoketest
 
@@ -14,21 +12,14 @@ generic-service:
     enabled: true
     tlsSecretName: dps-smoketest-cert
 
-  # Environment variables to load into the deployment
   env:
     SERVER_PORT: 8080
     JAVA_OPTS: "-Xmx512m"
     SPRING_PROFILES_ACTIVE: "logstash"
 
-  # Pre-existing kubernetes secrets to load as environment variables in the deployment.
-  # namespace_secrets:
-  #   [name of kubernetes secret]:
-  #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
-
   namespace_secrets:
-    application-insights:
-      APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
     dps-smoketest:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
       OAUTH_CLIENT_ID: "OAUTH_CLIENT_ID"
       OAUTH_CLIENT_SECRET: "OAUTH_CLIENT_SECRET"
     domain-events-dps-smoketest-queue:

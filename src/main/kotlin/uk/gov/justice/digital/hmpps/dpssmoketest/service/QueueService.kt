@@ -3,6 +3,7 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.microsoft.applicationinsights.TelemetryClient
 import org.awaitility.kotlin.await
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,9 +30,10 @@ class QueueService(
   @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
   private val objectMapper: ObjectMapper,
   private val hmppsQueueService: HmppsQueueService,
+  private val telemetryClient: TelemetryClient,
 ) {
-  companion object {
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
+  private companion object {
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
   }
 
   protected val hmppsEventQueue by lazy {
@@ -59,7 +61,7 @@ class QueueService(
           TestStatus("Test for offender $nomsNumber $eventType event finished successfully", finalStatus)
         } else {
           TestStatus("Still waiting for offender $nomsNumber $eventType event")
-        }
+        }.also { status -> log.info("Result is $status - waiting total of $testMaxLengthSeconds") }
       }
       .onErrorResume(::failOnError)
   }
