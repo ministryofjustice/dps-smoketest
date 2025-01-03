@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
@@ -29,7 +28,6 @@ import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 
-@AutoConfigureWebTestClient(timeout = "PT10M")
 class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
 
   val poeOffenderNo = PoeTestProfiles.POE_T3.profile.nomsNumber
