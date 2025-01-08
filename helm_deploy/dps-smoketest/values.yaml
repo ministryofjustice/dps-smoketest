@@ -1,6 +1,7 @@
 generic-service:
   nameOverride: dps-smoketest
-
+  productId: DPS060
+  
   serviceAccountName: dps-smoketest
 
   image:
