@@ -43,17 +43,15 @@ class QueueService(
   protected val hmppsEventQueueUrl by lazy { hmppsEventQueue.queueUrl }
   protected val hmppsEventQueueSqsClient by lazy { hmppsEventQueue.sqsClient }
 
-  fun waitForEventToBeProduced(eventType: String, nomsNumber: String, finalStatus: TestProgress): Flux<TestStatus> =
-    Flux.interval(Duration.ofMillis(testResultPollMs))
-      .take(Duration.ofSeconds(testMaxLengthSeconds))
-      .flatMap { checkEventProduced(eventType, nomsNumber, finalStatus) }
-      .takeUntil(TestStatus::testComplete)
+  fun waitForEventToBeProduced(eventType: String, nomsNumber: String, finalStatus: TestProgress): Flux<TestStatus> = Flux.interval(Duration.ofMillis(testResultPollMs))
+    .take(Duration.ofSeconds(testMaxLengthSeconds))
+    .flatMap { checkEventProduced(eventType, nomsNumber, finalStatus) }
+    .takeUntil(TestStatus::testComplete)
 
   fun checkEventProduced(eventType: String, nomsNumber: String, finalStatus: TestProgress): Mono<TestStatus> {
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus("Check $eventType event produced $nomsNumber failed due to ${exception.message}", FAIL),
-      )
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(
+      TestStatus("Check $eventType event produced $nomsNumber failed due to ${exception.message}", FAIL),
+    )
 
     return Mono.just(checkForEvent(eventType, nomsNumber))
       .map {
@@ -92,9 +90,8 @@ class QueueService(
     await.until { hmppsEventQueueSqsClient.countMessagesOnQueue(hmppsEventQueueUrl) == 0 }
   }
 
-  internal fun SqsAsyncClient.countMessagesOnQueue(queueUrl: String): Int =
-    this.getQueueAttributes(GetQueueAttributesRequest.builder().queueUrl(queueUrl).attributeNames(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES).build())
-      .let { it.get().attributes()[QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES]?.toInt() ?: 0 }
+  internal fun SqsAsyncClient.countMessagesOnQueue(queueUrl: String): Int = this.getQueueAttributes(GetQueueAttributesRequest.builder().queueUrl(queueUrl).attributeNames(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES).build())
+    .let { it.get().attributes()[QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES]?.toInt() ?: 0 }
 }
 
 data class AdditionalInformation(val nomsNumber: String, val details: String?, val reason: String, val prisonId: String)

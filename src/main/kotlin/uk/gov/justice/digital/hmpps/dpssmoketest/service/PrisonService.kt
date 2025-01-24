@@ -15,11 +15,9 @@ class PrisonService(
   @Qualifier("prisonApiWebClient") private val webClient: WebClient,
 ) {
   fun triggerPoeReleaseTest(nomsNumber: String): Mono<TestStatus> {
-    fun failOnNotFound(): Mono<out TestStatus> =
-      Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
+    fun failOnNotFound(): Mono<out TestStatus> = Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
 
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(TestStatus("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(TestStatus("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
 
     return webClient.put()
       .uri("/api/smoketest/offenders/{nomsNumber}/release", nomsNumber)
@@ -31,11 +29,9 @@ class PrisonService(
   }
 
   fun triggerPoeRecallTest(nomsNumber: String): Mono<TestStatus> {
-    fun failOnNotFound(): Mono<out TestStatus> =
-      Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
+    fun failOnNotFound(): Mono<out TestStatus> = Mono.just(TestStatus("Trigger test failed. The offender $nomsNumber can not be found", FAIL))
 
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(TestStatus("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(TestStatus("Trigger for $nomsNumber failed due to ${exception.message}", FAIL))
 
     return webClient.put()
       .uri("/api/smoketest/offenders/{nomsNumber}/recall", nomsNumber)
@@ -47,21 +43,19 @@ class PrisonService(
   }
 
   fun configurePrisonerStatus(nomsNumber: String): Mono<TestStatus> {
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus(
-          "Offender we expected to exist $nomsNumber failed due to  ${exception.message}",
-          FAIL,
-        ),
-      )
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(
+      TestStatus(
+        "Offender we expected to exist $nomsNumber failed due to  ${exception.message}",
+        FAIL,
+      ),
+    )
 
-    fun failOnNotFound(): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus(
-          "Offender we expected to exist $nomsNumber was not found. Check the offender has not be deleted in NOMIS",
-          FAIL,
-        ),
-      )
+    fun failOnNotFound(): Mono<out TestStatus> = Mono.just(
+      TestStatus(
+        "Offender we expected to exist $nomsNumber was not found. Check the offender has not be deleted in NOMIS",
+        FAIL,
+      ),
+    )
     return webClient.put()
       .uri("/api/smoketest/offenders/{nomsNumber}/status", nomsNumber)
       .retrieve()
@@ -74,11 +68,9 @@ class PrisonService(
   private data class OffenderStatus(val inOutStatus: String)
 
   fun setOffenderDetailsTestData(nomsNumber: String, firstName: String, lastName: String): Mono<TestStatus> {
-    fun failOnNotFound(): Mono<out TestStatus> =
-      Mono.just(TestStatus("Update offender details test failed. The offender $nomsNumber can not be found", FAIL))
+    fun failOnNotFound(): Mono<out TestStatus> = Mono.just(TestStatus("Update offender details test failed. The offender $nomsNumber can not be found", FAIL))
 
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(TestStatus("Update offender details test failed for $nomsNumber failed due to ${exception.message}", FAIL))
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(TestStatus("Update offender details test failed for $nomsNumber failed due to ${exception.message}", FAIL))
 
     return webClient.post()
       .uri("/api/smoketest/offenders/{offenderNo}/details", nomsNumber)

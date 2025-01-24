@@ -189,48 +189,41 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
     }
   }
 
-  private fun postStartTest(): FluxExchangeResult<TestStatus> =
-    webTestClient.post()
-      .uri("/smoke-test/prison-offender-events/POE_T3")
-      .accept(TEXT_EVENT_STREAM)
-      .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
-      .exchange()
-      .expectStatus().isOk
-      .returnResult(TestStatus::class.java)
+  private fun postStartTest(): FluxExchangeResult<TestStatus> = webTestClient.post()
+    .uri("/smoke-test/prison-offender-events/POE_T3")
+    .accept(TEXT_EVENT_STREAM)
+    .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
+    .exchange()
+    .expectStatus().isOk
+    .returnResult(TestStatus::class.java)
 
-  private fun stubTriggerTest(status: Int = HTTP_OK) =
-    PrisonApiExtension.prisonApi.stubFor(
-      WireMock.put(WireMock.anyUrl()).willReturn(
-        WireMock.aResponse()
-          .withStatus(status),
-      ),
-    )
-
-  private fun stubReleaseTriggerTest(status: Int = HTTP_OK) =
-    PrisonApiExtension.prisonApi.stubFor(
-      WireMock.put("/api/smoketest/offenders/$poeOffenderNo/release").willReturn(
-        WireMock.aResponse()
-          .withStatus(status),
-      ),
-    )
-  private fun stubRecallTriggerTest(status: Int = HTTP_OK) =
-    PrisonApiExtension.prisonApi.stubFor(
-      WireMock.put("/api/smoketest/offenders/$poeOffenderNo/recall").willReturn(
-        WireMock.aResponse()
-          .withStatus(status),
-      ),
-    )
-}
-
-private fun String.loadJson(): String {
-  return PoeSmokeTestIntegrationTest::class.java.getResource("$this.json").readText()
-}
-
-private fun stubPrisonerStatus(offenderNo: String = PoeTestProfiles.POE_T3.profile.nomsNumber, status: Int = HTTP_OK) =
-  PrisonApiExtension.prisonApi.stubFor(
-    WireMock.put(WireMock.urlPathMatching("/api/smoketest/offenders/$offenderNo/status")).willReturn(
+  private fun stubTriggerTest(status: Int = HTTP_OK) = PrisonApiExtension.prisonApi.stubFor(
+    WireMock.put(WireMock.anyUrl()).willReturn(
       WireMock.aResponse()
-        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
         .withStatus(status),
     ),
   )
+
+  private fun stubReleaseTriggerTest(status: Int = HTTP_OK) = PrisonApiExtension.prisonApi.stubFor(
+    WireMock.put("/api/smoketest/offenders/$poeOffenderNo/release").willReturn(
+      WireMock.aResponse()
+        .withStatus(status),
+    ),
+  )
+  private fun stubRecallTriggerTest(status: Int = HTTP_OK) = PrisonApiExtension.prisonApi.stubFor(
+    WireMock.put("/api/smoketest/offenders/$poeOffenderNo/recall").willReturn(
+      WireMock.aResponse()
+        .withStatus(status),
+    ),
+  )
+}
+
+private fun String.loadJson(): String = PoeSmokeTestIntegrationTest::class.java.getResource("$this.json").readText()
+
+private fun stubPrisonerStatus(offenderNo: String = PoeTestProfiles.POE_T3.profile.nomsNumber, status: Int = HTTP_OK) = PrisonApiExtension.prisonApi.stubFor(
+  WireMock.put(WireMock.urlPathMatching("/api/smoketest/offenders/$offenderNo/status")).willReturn(
+    WireMock.aResponse()
+      .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+      .withStatus(status),
+  ),
+)
