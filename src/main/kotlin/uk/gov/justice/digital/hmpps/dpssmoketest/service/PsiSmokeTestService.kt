@@ -12,19 +12,17 @@ class PsiSmokeTestService(
   private val prisonService: PrisonService,
 ) {
 
-  fun runSmokeTest(testProfile: PsiTestParameters): Flux<TestStatus> =
-    generateRandomNames().let { (firstName, lastName) ->
-      Flux.concat(
-        prisonerSearchService.checkOffenderExists(testProfile.nomsNumber),
-        Flux.just(TestStatus("Will update name to $firstName $lastName")),
-        prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, firstName, lastName),
-        prisonerSearchService.waitForOffenderToBeFound(testProfile.nomsNumber, firstName, lastName),
-        prisonerSearchService.assertTestResult(testProfile.nomsNumber, firstName, lastName),
-      ).takeUntil(TestStatus::hasResult)
-    }
+  fun runSmokeTest(testProfile: PsiTestParameters): Flux<TestStatus> = generateRandomNames().let { (firstName, lastName) ->
+    Flux.concat(
+      prisonerSearchService.checkOffenderExists(testProfile.nomsNumber),
+      Flux.just(TestStatus("Will update name to $firstName $lastName")),
+      prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, firstName, lastName),
+      prisonerSearchService.waitForOffenderToBeFound(testProfile.nomsNumber, firstName, lastName),
+      prisonerSearchService.assertTestResult(testProfile.nomsNumber, firstName, lastName),
+    ).takeUntil(TestStatus::hasResult)
+  }
 
-  fun cleanup(testProfile: PsiTestParameters): Mono<TestStatus> =
-    prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, "PSI", "SMOKETEST")
+  fun cleanup(testProfile: PsiTestParameters): Mono<TestStatus> = prisonService.setOffenderDetailsTestData(testProfile.nomsNumber, "PSI", "SMOKETEST")
 }
 private fun generateRandomNames(): Pair<String, String> = randomUpperString() to randomUpperString()
 

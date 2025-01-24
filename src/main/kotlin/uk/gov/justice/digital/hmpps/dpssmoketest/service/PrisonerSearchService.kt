@@ -22,21 +22,19 @@ class PrisonerSearchService(
 ) {
 
   fun checkOffenderExists(nomsNumber: String): Mono<TestStatus> {
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus(
-          "Offender we expected to exist $nomsNumber failed due to  ${exception.message}",
-          FAIL,
-        ),
-      )
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(
+      TestStatus(
+        "Offender we expected to exist $nomsNumber failed due to  ${exception.message}",
+        FAIL,
+      ),
+    )
 
-    fun failOnNotFound(): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus(
-          "Offender we expected to exist $nomsNumber was not found. Check the offender has not be deleted in NOMIS",
-          FAIL,
-        ),
-      )
+    fun failOnNotFound(): Mono<out TestStatus> = Mono.just(
+      TestStatus(
+        "Offender we expected to exist $nomsNumber was not found. Check the offender has not be deleted in NOMIS",
+        FAIL,
+      ),
+    )
 
     return webClient.get()
       .uri("/prisoner/{id}", nomsNumber)
@@ -47,17 +45,15 @@ class PrisonerSearchService(
       .onErrorResume(::failOnError)
   }
 
-  fun waitForOffenderToBeFound(nomsNumber: String, firstName: String, lastName: String): Flux<TestStatus> =
-    Flux.interval(Duration.ofMillis(testResultPollMs))
-      .take(Duration.ofSeconds(testMaxLengthSeconds))
-      .flatMap { checkSearchTestComplete(nomsNumber, firstName, lastName) }
-      .takeUntil(TestStatus::testComplete)
+  fun waitForOffenderToBeFound(nomsNumber: String, firstName: String, lastName: String): Flux<TestStatus> = Flux.interval(Duration.ofMillis(testResultPollMs))
+    .take(Duration.ofSeconds(testMaxLengthSeconds))
+    .flatMap { checkSearchTestComplete(nomsNumber, firstName, lastName) }
+    .takeUntil(TestStatus::testComplete)
 
   fun checkSearchTestComplete(nomsNumber: String, firstName: String, lastName: String): Mono<TestStatus> {
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus("Check test results for $nomsNumber failed due to ${exception.message}", FAIL),
-      )
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(
+      TestStatus("Check test results for $nomsNumber failed due to ${exception.message}", FAIL),
+    )
 
     return searchForOffender(nomsNumber, firstName, lastName)
       .map {
@@ -72,13 +68,12 @@ class PrisonerSearchService(
   }
 
   fun assertTestResult(prisonerNumber: String, firstName: String, lastName: String): Mono<TestStatus> {
-    fun failOnError(exception: Throwable): Mono<out TestStatus> =
-      Mono.just(
-        TestStatus(
-          "Check test results for $prisonerNumber failed due to ${exception.message}",
-          FAIL,
-        ),
-      )
+    fun failOnError(exception: Throwable): Mono<out TestStatus> = Mono.just(
+      TestStatus(
+        "Check test results for $prisonerNumber failed due to ${exception.message}",
+        FAIL,
+      ),
+    )
 
     return searchForOffender(prisonerNumber, firstName, lastName).map {
       if (it.size != 1) {
@@ -97,13 +92,12 @@ class PrisonerSearchService(
     }.onErrorResume(::failOnError)
   }
 
-  private fun searchForOffender(nomsNumber: String, firstName: String, lastName: String): Mono<List<OffenderDetails>> =
-    webClient.post()
-      .uri("/global-search")
-      .contentType(MediaType.APPLICATION_JSON)
-      .body(searchByNumberNameBody(nomsNumber, firstName, lastName))
-      .retrieve()
-      .bodyToMono(SearchResults::class.java).map { it.content }
+  private fun searchForOffender(nomsNumber: String, firstName: String, lastName: String): Mono<List<OffenderDetails>> = webClient.post()
+    .uri("/global-search")
+    .contentType(MediaType.APPLICATION_JSON)
+    .body(searchByNumberNameBody(nomsNumber, firstName, lastName))
+    .retrieve()
+    .bodyToMono(SearchResults::class.java).map { it.content }
 
   private fun searchByNumberNameBody(
     prisonerNumber: String,

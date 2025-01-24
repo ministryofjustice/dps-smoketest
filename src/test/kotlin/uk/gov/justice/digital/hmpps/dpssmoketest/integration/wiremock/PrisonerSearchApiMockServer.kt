@@ -13,7 +13,10 @@ import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 
-class PrisonerSearchExtension : BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+class PrisonerSearchExtension :
+  BeforeAllCallback,
+  AfterAllCallback,
+  BeforeEachCallback {
   companion object {
     @JvmField
     val prisonerSearch = PrisonerSearchMockServer(

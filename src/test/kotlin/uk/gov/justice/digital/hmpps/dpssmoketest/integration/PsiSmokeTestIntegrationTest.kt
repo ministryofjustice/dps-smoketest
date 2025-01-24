@@ -248,38 +248,35 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
   private fun getLastRequest() = prisonApi.serveEvents.requests.first()
 
-  private fun postStartTest(): FluxExchangeResult<TestStatus> =
-    webTestClient.post()
-      .uri("/smoke-test/prisoner-search/PSI_T3")
-      .accept(TEXT_EVENT_STREAM)
-      .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
-      .exchange()
-      .expectStatus().isOk
-      .returnResult(TestStatus::class.java)
+  private fun postStartTest(): FluxExchangeResult<TestStatus> = webTestClient.post()
+    .uri("/smoke-test/prisoner-search/PSI_T3")
+    .accept(TEXT_EVENT_STREAM)
+    .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
+    .exchange()
+    .expectStatus().isOk
+    .returnResult(TestStatus::class.java)
 }
 
-private fun stubCheckOffenderExists(status: Int = HTTP_OK) =
-  prisonerSearch.stubFor(
-    WireMock.get(WireMock.urlPathMatching("/prisoner/[A-Z0-9]*")).willReturn(
-      WireMock.aResponse()
-        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .withStatus(status)
-        .withBody(
-          """
+private fun stubCheckOffenderExists(status: Int = HTTP_OK) = prisonerSearch.stubFor(
+  WireMock.get(WireMock.urlPathMatching("/prisoner/[A-Z0-9]*")).willReturn(
+    WireMock.aResponse()
+      .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .withStatus(status)
+      .withBody(
+        """
             { "firstName": "Jane", "lastName": "Smith", "prisonerNumber": "A7940DY" }
-          """.trimIndent(),
-        ),
-    ),
-  )
+        """.trimIndent(),
+      ),
+  ),
+)
 
-private fun stubChangeOffenderName(status: Int = HTTP_OK) =
-  prisonApi.stubFor(
-    WireMock.post(WireMock.anyUrl()).willReturn(
-      WireMock.aResponse()
-        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .withStatus(status),
-    ),
-  )
+private fun stubChangeOffenderName(status: Int = HTTP_OK) = prisonApi.stubFor(
+  WireMock.post(WireMock.anyUrl()).willReturn(
+    WireMock.aResponse()
+      .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .withStatus(status),
+  ),
+)
 
 private fun stubTestNeverCompletes() {
   prisonerSearch.stubFor(
