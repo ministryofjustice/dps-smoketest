@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "7.1.2"
   kotlin("plugin.spring") version "2.1.10"
 }
 
@@ -16,8 +16,8 @@ dependencies {
   implementation("org.awaitility:awaitility-kotlin:4.2.2")
 
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.2.0")
-  testImplementation("io.projectreactor:reactor-test:3.7.2")
-  testImplementation("org.wiremock:wiremock-standalone:3.11.0")
+  testImplementation("io.projectreactor:reactor-test:3.7.3")
+  testImplementation("org.wiremock:wiremock-standalone:3.12.0")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.12.1")
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.25") {
