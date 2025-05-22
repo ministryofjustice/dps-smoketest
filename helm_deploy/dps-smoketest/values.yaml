@@ -5,7 +5,7 @@ generic-service:
   serviceAccountName: dps-smoketest
 
   image:
-    repository: quay.io/hmpps/dps-smoketest
+    repository: ghcr.io/ministryofjustice/dps-smoketest
     tag: app_version # override at deployment time
     port: 8080
 
@@ -19,17 +19,17 @@ generic-service:
     SPRING_PROFILES_ACTIVE: "logstash"
 
   namespace_secrets:
-    dps-smoketest:
+    dps-smoketest-application-insights:
       APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
-      OAUTH_CLIENT_ID: "OAUTH_CLIENT_ID"
-      OAUTH_CLIENT_SECRET: "OAUTH_CLIENT_SECRET"
+    dps-smoketest-client-creds:
+      OAUTH_CLIENT_ID: "API_CLIENT_ID"
+      OAUTH_CLIENT_SECRET: "API_CLIENT_SECRET"
     domain-events-dps-smoketest-queue:
       HMPPS_SQS_QUEUES_HMPPSEVENTQUEUE_QUEUE_NAME: "sqs_queue_name"
 
   allowlist:
     groups:
       - internal
-      - circleci
 
 generic-prometheus-alerts:
   targetApplication: dps-smoketest
