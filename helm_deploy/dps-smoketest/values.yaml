@@ -30,6 +30,7 @@ generic-service:
   allowlist:
     groups:
       - internal
+      - circleci
 
 generic-prometheus-alerts:
   targetApplication: dps-smoketest
