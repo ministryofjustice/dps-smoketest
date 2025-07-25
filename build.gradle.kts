@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.4"
   kotlin("plugin.spring") version "2.2.0"
 }
 
@@ -9,14 +9,14 @@ configurations {
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.10")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.9")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.4.11")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.4.10")
 
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
   implementation("org.awaitility:awaitility-kotlin:4.3.0")
 
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.4.7")
-  testImplementation("io.projectreactor:reactor-test:3.7.7")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.4.11")
+  testImplementation("io.projectreactor:reactor-test:3.7.8")
   testImplementation("org.wiremock:wiremock-standalone:3.13.1")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.13.1")
