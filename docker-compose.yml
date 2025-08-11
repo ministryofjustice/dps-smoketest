@@ -25,7 +25,7 @@ services:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=nomis-hsqldb
   hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
+    image: ghcr.io/ministryofjustice/hmpps-auth:latest
     networks:
       - hmpps
     container_name: hmpps-auth
@@ -37,7 +37,7 @@ services:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
   prisoner-search:
-    image: quay.io/hmpps/hmpps-prisoner-search:latest
+    image: ghcr.io/ministryofjustice/hmpps-prisoner-search:latest
     networks:
       - hmpps
     container_name: prisoner-search
