@@ -87,3 +87,7 @@ smoketest:
 aws:
   provider: aws
   region: eu-west-2
+
+hmpps:
+  sqs:
+    defaultErrorVisibilityTimeout: 1, 10, 60, 600
