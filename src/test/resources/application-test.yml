@@ -32,3 +32,9 @@ hmpps.sqs:
   queues:
     hmppseventqueue:
       queueName: ${random.uuid}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
