@@ -22,7 +22,7 @@ spring:
       client:
         registration:
           prison-api:
-            provider: hmpps-auth-with-user
+            provider: hmpps-auth
             client-id: ${smoketest.client.client-id}
             client-secret: ${smoketest.client.client-secret}
             authorization-grant-type: client_credentials
@@ -34,8 +34,6 @@ spring:
         provider:
           hmpps-auth:
             token-uri: ${oauth.endpoint.url}/oauth/token
-          hmpps-auth-with-user:
-            token-uri: ${oauth.endpoint.url}/oauth/token?username=SMOKE_TEST_USER
   web:
     error:
       include-message: always
