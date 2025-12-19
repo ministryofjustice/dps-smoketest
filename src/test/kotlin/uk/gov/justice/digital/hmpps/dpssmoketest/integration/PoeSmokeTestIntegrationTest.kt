@@ -17,6 +17,7 @@ import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest
+import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.OAuthExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.COMPLETE
@@ -186,6 +187,18 @@ class PoeSmokeTestIntegrationTest : IntegrationTestBase() {
         .expectNext(TestStatus("Triggered test for $poeOffenderNo"))
         .expectNext(TestStatus("Test for offender $poeOffenderNo prison-offender-events.prisoner.received event finished successfully", SUCCESS))
         .verifyComplete()
+    }
+
+    @Test
+    fun `smoke test user passed through to auth`() {
+      val results = postStartTest()
+
+      StepVerifier.create(results.responseBody).expectNextCount(6).verifyComplete()
+
+      OAuthExtension.oAuthApi.verify(
+        WireMock.postRequestedFor(WireMock.urlEqualTo("/auth/oauth/token"))
+          .withRequestBody(WireMock.equalTo("grant_type=client_credentials&username=SMOKE_TEST_USER")),
+      )
     }
   }
 

@@ -16,6 +16,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.MediaType.TEXT_EVENT_STREAM
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import reactor.test.StepVerifier
+import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.OAuthExtension
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonApiExtension.Companion.prisonApi
 import uk.gov.justice.digital.hmpps.dpssmoketest.integration.wiremock.PrisonerSearchExtension.Companion.prisonerSearch
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
@@ -84,6 +85,25 @@ class PsiSmokeTestIntegrationTest : IntegrationTestBase() {
 
       StepVerifier.create(results.responseBody).expectNextCount(6)
         .verifyComplete()
+    }
+
+    @Test
+    fun `smoke test user passed through to auth`() {
+      val results = webTestClient.post()
+        .uri("/smoke-test/prisoner-search/PSI_T3")
+        .accept(TEXT_EVENT_STREAM)
+        .headers(jwtAuthHelper.setAuthorisationHeader(clientId = "dps-smoke-test", roles = listOf("ROLE_SMOKE_TEST")))
+        .exchange()
+        .expectStatus().isOk
+        .returnResult(String::class.java)
+
+      StepVerifier.create(results.responseBody).expectNextCount(6)
+        .verifyComplete()
+
+      OAuthExtension.oAuthApi.verify(
+        WireMock.postRequestedFor(WireMock.urlEqualTo("/auth/oauth/token"))
+          .withRequestBody(WireMock.equalTo("grant_type=client_credentials&username=SMOKE_TEST_USER")),
+      )
     }
   }
 
