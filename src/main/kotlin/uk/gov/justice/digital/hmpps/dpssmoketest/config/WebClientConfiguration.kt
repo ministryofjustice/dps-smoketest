@@ -28,9 +28,6 @@ class WebClientConfiguration(
   @Value("\${api.timeout:10s}") val timeout: Duration,
 ) {
   @Bean
-  fun webClientBuilder(): WebClient.Builder = WebClient.builder()
-
-  @Bean
   fun prisonApiWebClient(
     clientRegistrationRepository: ClientRegistrationRepository,
     oAuth2AuthorizedClientService: OAuth2AuthorizedClientService,
