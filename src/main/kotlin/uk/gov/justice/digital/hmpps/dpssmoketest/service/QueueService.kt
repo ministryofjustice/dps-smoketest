@@ -2,8 +2,6 @@
 
 package uk.gov.justice.digital.hmpps.dpssmoketest.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.microsoft.applicationinsights.TelemetryClient
 import org.awaitility.kotlin.await
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -17,6 +15,7 @@ import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.QueueAttributeName
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
+import tools.jackson.databind.ObjectMapper
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
@@ -30,7 +29,6 @@ class QueueService(
   @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
   private val objectMapper: ObjectMapper,
   private val hmppsQueueService: HmppsQueueService,
-  private val telemetryClient: TelemetryClient,
 ) {
   private companion object {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
