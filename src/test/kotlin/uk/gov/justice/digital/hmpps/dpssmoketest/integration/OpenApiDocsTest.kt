@@ -1,13 +1,14 @@
 package uk.gov.justice.digital.hmpps.dpssmoketest.integration
 
-import io.opentelemetry.sdk.testing.assertj.OpenTelemetryAssertions.assertThat
 import io.swagger.v3.parser.OpenAPIV3Parser
 import net.minidev.json.JSONArray
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.MediaType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.text.contains
 
 class OpenApiDocsTest : IntegrationTestBase() {
   @LocalServerPort
@@ -16,7 +17,7 @@ class OpenApiDocsTest : IntegrationTestBase() {
   @Test
   fun `open api docs are available`() {
     webTestClient.get()
-      .uri("/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config")
+      .uri("/swagger-ui/index.html?configUrl=/v3/api-docs")
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
@@ -39,8 +40,14 @@ class OpenApiDocsTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody()
-      .jsonPath("paths").isNotEmpty
+      .expectBody().jsonPath("paths").isNotEmpty
+  }
+
+  @Test
+  fun `the open api json is valid and contains documentation`() {
+    val result = OpenAPIV3Parser().readLocation("http://localhost:$port/v3/api-docs", null, null)
+    assertThat(result.messages).isEmpty()
+    assertThat(result.openAPI.paths).isNotEmpty
   }
 
   @Test
@@ -56,13 +63,6 @@ class OpenApiDocsTest : IntegrationTestBase() {
   }
 
   @Test
-  fun `the open api json is valid and contains documentation`() {
-    val result = OpenAPIV3Parser().readLocation("http://localhost:$port/v3/api-docs", null, null)
-    assertThat(result.messages).isEmpty()
-    assertThat(result.openAPI.paths).isNotEmpty
-  }
-
-  @Test
   fun `the security scheme is setup for bearer tokens`() {
     webTestClient.get()
       .uri("/v3/api-docs")
@@ -74,6 +74,30 @@ class OpenApiDocsTest : IntegrationTestBase() {
       .jsonPath("$.components.securitySchemes.smoke-test-security-scheme.scheme").isEqualTo("bearer")
       .jsonPath("$.components.securitySchemes.smoke-test-security-scheme.bearerFormat").isEqualTo("JWT")
       .jsonPath("$.security[0].smoke-test-security-scheme")
-      .isEqualTo(JSONArray().apply { addAll(listOf("read")) })
+      .isEqualTo(JSONArray().apply { add("read") })
+  }
+
+  @Test
+  fun `the open api json doesn't include LocalTime`() {
+    webTestClient.get()
+      .uri("/v3/api-docs")
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .jsonPath("components.schemas.LocalTime").doesNotExist()
+  }
+
+  @Test
+  fun `the response contains required fields`() {
+    webTestClient.get()
+      .uri("/v3/api-docs")
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .jsonPath("$.components.schemas.TestStatus.required").value<List<String>> {
+        assertThat(it).containsExactlyInAnyOrder("description", "progress")
+      }
   }
 }
