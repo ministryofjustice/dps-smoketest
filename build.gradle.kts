@@ -1,11 +1,11 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.0.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.0.3"
   kotlin("plugin.spring") version "2.3.0"
 }
 
 dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.0.0")
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:6.0.2-beta")
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.0.0-beta2")
 
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-webclient")

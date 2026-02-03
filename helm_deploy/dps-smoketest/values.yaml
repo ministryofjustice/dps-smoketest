@@ -15,7 +15,6 @@ generic-service:
 
   env:
     SERVER_PORT: 8080
-    JAVA_OPTS: "-Xmx512m"
     SPRING_PROFILES_ACTIVE: "logstash"
 
   namespace_secrets:
