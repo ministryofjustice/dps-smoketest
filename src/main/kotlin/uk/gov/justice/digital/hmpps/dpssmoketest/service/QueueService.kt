@@ -15,19 +15,20 @@ import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import software.amazon.awssdk.services.sqs.model.QueueAttributeName
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest
-import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress
 import uk.gov.justice.digital.hmpps.dpssmoketest.resource.SmokeTestResource.TestStatus.TestProgress.FAIL
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
 import uk.gov.justice.hmpps.sqs.MissingQueueException
+import uk.gov.justice.hmpps.sqs.SnsMessage
 import java.time.Duration
 
 @Service
 class QueueService(
   @Value("\${test.maxLengthSeconds}") private val testMaxLengthSeconds: Long,
   @Value("\${test.resultPollMs}") private val testResultPollMs: Long,
-  private val objectMapper: ObjectMapper,
+  private val jsonMapper: JsonMapper,
   private val hmppsQueueService: HmppsQueueService,
 ) {
   private companion object {
@@ -69,9 +70,9 @@ class QueueService(
         ReceiveMessageRequest.builder().queueUrl(hmppsEventQueueUrl).maxNumberOfMessages(1).build(),
       ).get().messages().firstOrNull()
         ?.also { msg ->
-          val (message, messageId, messageAttributes) = objectMapper.readValue(msg.body(), HMPPSMessage::class.java)
-          val eventType = messageAttributes.eventType.Value
-          val hmppsDomainEvent = objectMapper.readValue(message, HMPPSDomainEvent::class.java)
+          val (message, messageId, messageAttributes) = jsonMapper.readValue(msg.body(), SnsMessage::class.java)
+          val eventType = messageAttributes.eventType
+          val hmppsDomainEvent = jsonMapper.readValue(message, HMPPSDomainEvent::class.java)
 
           log.info("Received message $message $messageId type $eventType")
           hmppsEventQueueSqsClient.deleteMessage(
@@ -94,11 +95,3 @@ class QueueService(
 
 data class AdditionalInformation(val nomsNumber: String, val details: String?, val reason: String, val prisonId: String)
 data class HMPPSDomainEvent(val additionalInformation: AdditionalInformation)
-
-data class HMPPSEventType(val Value: String, val Type: String)
-data class HMPPSMessageAttributes(val eventType: HMPPSEventType)
-data class HMPPSMessage(
-  val Message: String,
-  val MessageId: String,
-  val MessageAttributes: HMPPSMessageAttributes,
-)
