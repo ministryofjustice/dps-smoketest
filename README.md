@@ -1,5 +1,5 @@
 # DPS Smoke Tests
-[![repo standards badge](https://img.shields.io/badge/endpoint.svg?&style=flat&logo=github&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fdps-smoketest)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-report/dps-smoketest "Link to report")
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/dps-smoketest/badge?style=flat)](https://github-community.service.justice.gov.uk/repository-standards/dps-smoketest)
 [![Docker Repository on ghcr](https://img.shields.io/badge/ghcr.io-repository-2496ED.svg?logo=docker)](https://ghcr.io/ministryofjustice/dps-smoketest)
 [![API docs](https://img.shields.io/badge/API_docs_-view-85EA2D.svg?logo=swagger)](https://dps-smoketest-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html)
 
