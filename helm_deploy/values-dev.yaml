@@ -5,6 +5,7 @@ generic-service:
   replicaCount: 2
   ingress:
     host: dps-smoketest-dev.hmpps.service.justice.gov.uk
+    className: "default-non-prod"
 
   scheduledDowntime:
     enabled: true
