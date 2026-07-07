@@ -1,10 +1,6 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.6"
   kotlin("plugin.spring") version "2.4.0"
-}
-
-dependencyCheck {
-  suppressionFiles.add("azure-dependency-check-suppress.xml")
 }
 
 dependencies {
@@ -16,10 +12,6 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
   implementation("org.awaitility:awaitility-kotlin:4.3.0")
 
-  val appinsightsCore = "core:2.6.4"
-  implementation("io.micrometer:micrometer-registry-azure-monitor:1.17.0")
-  implementation("com.microsoft.azure:applicationinsights-$appinsightsCore")
-
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
   testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
@@ -27,7 +19,7 @@ dependencies {
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.14.0")
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.42") {
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.45") {
     exclude(group = "io.swagger.core.v3")
   }
 }
