@@ -12,14 +12,14 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.0")
   implementation("org.awaitility:awaitility-kotlin:4.3.0")
 
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.1")
   testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
-  testImplementation("io.projectreactor:reactor-test:3.8.6")
+  testImplementation("io.projectreactor:reactor-test:3.8.7")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("io.opentelemetry:opentelemetry-sdk-testing")
   testImplementation("com.google.code.gson:gson:2.14.0")
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.45") {
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.47") {
     exclude(group = "io.swagger.core.v3")
   }
 }
